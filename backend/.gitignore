@@ -1,0 +1,18 @@
+# Ignorar la carpeta env para que quien se baje el repo no se le clone mi env
+./env
+
+# Ignorar el pycache
+./core_API/api/__pycache__/
+
+# Ignorar el archivo de base de datos
+./core_API/db.sqlite3
+
+# Ignorar ciertas cosas de la carpeta managment
+./core_API/api/managment/__pycache__/
+./core_API/api/managment/commands/__pycache__/
+
+# Ignorar ciertas cosas de las migraciones
+./core_API/api/migrations/__pycache__/
+
+# Ignorar el pycache del core de la API
+./core_API/core_API/__pycache__/
