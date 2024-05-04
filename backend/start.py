@@ -11,19 +11,20 @@ async def create_virtual_env():
         # Comandos específicos para Windows
         subprocess.run(['python', '-m', 'venv', 'env'], check=True)
         subprocess.run(['env\\Scripts\\activate.bat'], check=True, shell=True)
-    elif operating_system == 'Linux' or operating_system == 'Darwin':
-        # Comandos especificos para Linux
+    elif operating_system in ('Linux', 'Darwin'):
+        # Comandos específicos para Linux y MacOS
         subprocess.run(['python3', '-m', 'venv', 'env'], check=True)
         subprocess.run(['source', 'env/bin/activate'], check=True, shell=True)
     else:
         print("Sistema operativo no compatible.")
-    
-    # Crear el archivo .gitignore dentro de la carpeta env
+
+    # Crear el archivo .gitignore dentro de la carpeta env si no existe
     gitignore_path = os.path.join('env', '.gitignore')
-    with open(gitignore_path, 'w') as f:
-        # Ignorar todos los archivos y carpetas dentro de env
-        f.write('# Generado automaticamente\n')
-        f.write('*\n')  
+    if not os.path.exists(gitignore_path):
+        with open(gitignore_path, 'w') as f:
+            # Ignorar todos los archivos y carpetas dentro de env
+            f.write('# Generado automáticamente por el script de configuración\n')
+            f.write('*\n')  
 
 async def install_requirements(requirements_file):
     # Obtener la ruta completa del archivo de dependencias
@@ -36,10 +37,12 @@ async def run_migrations():
     # Cambiar al directorio del proyecto
     os.chdir('./core_API')
     
+    # Ejecutar las migraciones de Django
     subprocess.run(['python', 'manage.py', 'makemigrations'], check=True)
     subprocess.run(['python', 'manage.py', 'migrate'], check=True)
 
 async def seed_database():
+    # Sembrar la base de datos
     subprocess.run(['python', 'manage.py', 'seed_db'], check=True)
     
 async def main():
@@ -52,7 +55,7 @@ async def main():
     # Migraciones
     await run_migrations()
 
-    # Seed la base de datos
+    # Sembrar la base de datos
     await seed_database()
 
 if __name__ == "__main__":
