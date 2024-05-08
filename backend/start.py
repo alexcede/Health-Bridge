@@ -6,7 +6,7 @@ import asyncio
 async def create_virtual_env():
     # Obtener el nombre del sistema operativo
     operating_system = platform.system()
-
+    print('Creando entorno virtual....')
     if operating_system == 'Windows':
         # Comandos específicos para Windows
         subprocess.run(['python', '-m', 'venv', 'env'], check=True)
@@ -25,6 +25,7 @@ async def create_virtual_env():
             # Ignorar todos los archivos y carpetas dentro de env
             f.write('# Generado automáticamente por el script de configuración\n')
             f.write('*\n')  
+    print('------------------Entorno virtual creado correctamente!------------------')
 
 async def install_requirements(requirements_file):
     # Obtener la ruta completa del archivo de dependencias
@@ -32,6 +33,7 @@ async def install_requirements(requirements_file):
     
     # Instalar las dependencias desde el archivo requirements.txt
     subprocess.run(['pip', 'install', '-r', requirements_path], check=True)
+    print('---------------Dependencias instaladas correctamente!-----------------')
 
 async def run_migrations():
     # Cambiar al directorio del proyecto
@@ -40,10 +42,13 @@ async def run_migrations():
     # Ejecutar las migraciones de Django
     subprocess.run(['python', 'manage.py', 'makemigrations'], check=True)
     subprocess.run(['python', 'manage.py', 'migrate'], check=True)
+    print('--------------Migraciones completadas correctamente!----------------')
 
 async def seed_database():
     # Sembrar la base de datos
     subprocess.run(['python', 'manage.py', 'seed_db'], check=True)
+    print('-------------La base de datos ha sido sembrada con exito!-----------------')
+
     
 async def main():
     # Crear el entorno virtual y activarlo
