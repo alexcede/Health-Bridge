@@ -4,7 +4,7 @@ from django.contrib.auth.hashers import make_password
 from api.models import Admin, Doctor, User, UserSupport, Assignment, Report, Recipe
 
 seeder = Seed.seeder(locale='es_ES')
-faker = Faker('es_ES')
+faker = Faker(locale='es_ES')
 
 # Seed para la tabla Admin
 seeder.add_entity(Admin, 1, {
@@ -59,7 +59,7 @@ seeder.add_entity(UserSupport, 10, {
 seeder.add_entity(Assignment, 10, {
     'doctorId': lambda x: Doctor.objects.order_by('?').first(),
     'userId': lambda x: User.objects.order_by('?').first(),
-    'dateCreated': faker.date_time_this_year()
+    'active': True
 })
 
 # Seed para la tabla Report (Nota: Asegúrate de tener al menos 10 Doctores y 10 Usuarios en la base de datos antes de ejecutar este seeder)
@@ -67,7 +67,6 @@ seeder.add_entity(Report, 10, {
     'doctorId': lambda x: Doctor.objects.order_by('?').first(),
     'userId': lambda x: User.objects.order_by('?').first(),
     'reportInfo': faker.text(),
-    'dateCreated': faker.date_time_this_year()
 })
 
 # Seed para la tabla Recipe (Nota: Asegúrate de tener al menos 10 Doctores, 10 Usuarios y 10 Reports en la base de datos antes de ejecutar este seeder)
@@ -76,7 +75,7 @@ seeder.add_entity(Recipe, 10, {
     'userId': lambda x: User.objects.order_by('?').first(),
     'reportId': lambda x: Report.objects.order_by('?').first(),
     'medicine': faker.word(),
-    'dateCreated': faker.date_time_this_year()
+    'active': True
 })
 
 # Ejecutar los seeders

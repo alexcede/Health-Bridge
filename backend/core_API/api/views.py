@@ -248,4 +248,132 @@ def delete_user_support(request, id):
             return JsonResponse("Usuario de soporte desactivado correctamente.", status=200, safe=False)
         except UserSupport.DoesNotExist:
             return JsonResponse("Usuario de soporte no encontrado.", status=404, safe=False)
+        
+#-------------------------------END-USER-SUPPORT----------------------------------------------------------
+
+#-------------------------------ASSIGNMENT------------------------------------------
+
+# Añade una nueva asignacion
+@csrf_exempt
+def add_assignment(request):
+    if request.method == 'POST':
+        assignment_data = JSONParser().parse(request)
+        assignment_serializer = AssignmentSerializer(data=assignment_data)
+        if assignment_serializer.is_valid():
+            assignment_serializer.save()
+            return JsonResponse("Asignación creada correctamente!", safe=False)
+        return JsonResponse("No se pudo crear la asignación.", status=400, safe=False)
+    else:
+        return JsonResponse("Método no permitido. Se requiere un método POST.", status=405, safe=False)
+    
+# Coje la asignacion por id
+@csrf_exempt
+def get_assignment(request, id):
+    if request.method == 'GET':
+        try:
+            # Buscar la asignación por su ID
+            assignment = Assignment.objects.get(id=id)
+            # Serializar los objetos de Doctor y User relacionados
+            doctor_serializer = DoctorSerializer(assignment.doctorId)
+            user_serializer = UserSerializer(assignment.userId)
+            # Crear un diccionario con la información
+            assignment_data = {
+                'doctor': doctor_serializer.data,
+                'user': user_serializer.data,
+                'dateCreated': assignment.dateCreated
+            }
+            return JsonResponse(assignment_data, safe=False)
+        except Assignment.DoesNotExist:
+            return JsonResponse("Asignación no encontrada.", status=404, safe=False)
+
+# Coje todas las asignaciones del doctor
+@csrf_exempt
+def get_doctor_assignments(request, doctor_id):
+    if request.method == 'GET':
+        try:
+            # Buscar todas las asignaciones del doctor por su ID
+            assignments = Assignment.objects.filter(doctorId=doctor_id)
+            # Serializar los objetos de Doctor y User relacionados
+            assignments_data = []
+            for assignment in assignments:
+                doctor_serializer = DoctorSerializer(assignment.doctorId)
+                user_serializer = UserSerializer(assignment.userId)
+                # Crear un diccionario con la información de cada asignación
+                assignment_data = {
+                    'doctor': doctor_serializer.data,
+                    'user': user_serializer.data,
+                    'dateCreated': assignment.dateCreated
+                }
+                assignments_data.append(assignment_data)
+            return JsonResponse(assignments_data, safe=False)
+        except Doctor.DoesNotExist:
+            return JsonResponse("Doctor no encontrado.", status=404, safe=False)
+
+#Coje todas las asignaciones del usuario
+@csrf_exempt
+def get_user_assignments(request, user_id):
+    if request.method == 'GET':
+        try:
+            # Buscar todas las asignaciones del usuario por su ID
+            assignments = Assignment.objects.filter(userId=user_id)
+            # Serializar los objetos de Doctor y User relacionados
+            assignments_data = []
+            for assignment in assignments:
+                doctor_serializer = DoctorSerializer(assignment.doctorId)
+                user_serializer = UserSerializer(assignment.userId)
+                # Crear un diccionario con la información de cada asignación
+                assignment_data = {
+                    'doctor': doctor_serializer.data,
+                    'user': user_serializer.data,
+                    'dateCreated': assignment.dateCreated
+                }
+                assignments_data.append(assignment_data)
+            return JsonResponse(assignments_data, safe=False)
+        except User.DoesNotExist:
+            return JsonResponse("Usuario no encontrado.", status=404, safe=False)
+
+# Coje la ultima asignacion del
+@csrf_exempt
+def get_active_user_assignment(request, user_id):
+    if request.method == 'GET':
+        try:
+            # Buscar la asignación más reciente del usuario por su ID
+            latest_assignment = Assignment.objects.filter(userId=user_id).latest('dateCreated')
+            # Serializar los objetos de Doctor y User relacionados
+            doctor_serializer = DoctorSerializer(latest_assignment.doctorId)
+            user_serializer = UserSerializer(latest_assignment.userId)
+            # Crear un diccionario con la información de la asignación más reciente
+            latest_assignment_data = {
+                'doctor': doctor_serializer.data,
+                'user': user_serializer.data,
+                'dateCreated': latest_assignment.dateCreated
+            }
+            return JsonResponse(latest_assignment_data, safe=False)
+        except Assignment.DoesNotExist:
+            return JsonResponse("No se encontraron asignaciones para este usuario.", status=404, safe=False)
+
+# Cambiar el campo active a True
+@csrf_exempt
+def activate_assignment(request, id):
+    if request.method == 'PUT':
+        try:
+            assignment = Assignment.objects.get(id=id)
+            assignment.active = True
+            assignment.save()
+            return JsonResponse("Asignación activada correctamente.", status=200, safe=False)
+        except Assignment.DoesNotExist:
+            return JsonResponse("Asignación no encontrada.", status=404, safe=False)
+
+# Cambiar el campo active a False
+@csrf_exempt
+def delete_assignment(request, id):
+    if request.method == 'DELETE':
+        try:
+            assignment = Assignment.objects.get(id=id)
+            assignment.active = False
+            assignment.save()
+            return JsonResponse("Asignación eliminada correctamente.", status=200, safe=False)
+        except Assignment.DoesNotExist:
+            return JsonResponse("Asignación no encontrada.", status=404, safe=False)
+
 
