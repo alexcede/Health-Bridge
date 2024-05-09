@@ -4,7 +4,7 @@ from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 
 from api.models import Admin,Doctor,User,UserSupport,Assignment,Report,Recipe
-from api.serializers import AdminSerializer,DoctorSerializer,UserSerializer,UserSupportSerializer,AssignmentSerializer,RecipeSerializer
+from api.serializers import AdminSerializer,DoctorSerializer,UserSerializer,UserSupportSerializer,AssignmentSerializer,ReportSerializer,RecipeSerializer
 
 #-----------------------------DOCTORS-------------------------------
 #Coje a todos los doctores de la base de datos
@@ -257,14 +257,33 @@ def delete_user_support(request, id):
 @csrf_exempt
 def add_assignment(request):
     if request.method == 'POST':
-        assignment_data = JSONParser().parse(request)
-        assignment_serializer = AssignmentSerializer(data=assignment_data)
-        if assignment_serializer.is_valid():
-            assignment_serializer.save()
-            return JsonResponse("Asignación creada correctamente!", safe=False)
-        return JsonResponse("No se pudo crear la asignación.", status=400, safe=False)
+        try:
+            # Obtener los datos de la solicitud en formato JSON
+            assignment_data = JSONParser().parse(request)
+            
+            # Obtener el ID del doctor y del usuario de los datos de la solicitud
+            doctor_id = assignment_data.get('doctorId')
+            user_id = assignment_data.get('userId')
+
+            # Verificar si el doctor y el usuario existen en la base de datos
+            doctor = Doctor.objects.get(id=doctor_id)
+            user = User.objects.get(id=user_id)
+
+            # Crear la asignación con los datos proporcionados
+            assignment_serializer = AssignmentSerializer(data=assignment_data)
+            
+            if assignment_serializer.is_valid():
+                assignment_serializer.save()
+                return JsonResponse("Asignación creada correctamente!", safe=False)
+            else:
+                return JsonResponse("Los datos de la asignación no son válidos.", status=400, safe=False)
+        except Doctor.DoesNotExist:
+            return JsonResponse("Doctor no encontrado.", status=404, safe=False)
+        except User.DoesNotExist:
+            return JsonResponse("Usuario no encontrado.", status=404, safe=False)
     else:
         return JsonResponse("Método no permitido. Se requiere un método POST.", status=405, safe=False)
+
     
 # Coje la asignacion por id
 @csrf_exempt
@@ -278,6 +297,7 @@ def get_assignment(request, id):
             user_serializer = UserSerializer(assignment.userId)
             # Crear un diccionario con la información
             assignment_data = {
+                'id': assignment.id,
                 'doctor': doctor_serializer.data,
                 'user': user_serializer.data,
                 'dateCreated': assignment.dateCreated
@@ -300,6 +320,7 @@ def get_doctor_assignments(request, doctor_id):
                 user_serializer = UserSerializer(assignment.userId)
                 # Crear un diccionario con la información de cada asignación
                 assignment_data = {
+                    'id': assignment.id,
                     'doctor': doctor_serializer.data,
                     'user': user_serializer.data,
                     'dateCreated': assignment.dateCreated
@@ -308,6 +329,60 @@ def get_doctor_assignments(request, doctor_id):
             return JsonResponse(assignments_data, safe=False)
         except Doctor.DoesNotExist:
             return JsonResponse("Doctor no encontrado.", status=404, safe=False)
+
+# Coje todas las asignaciones activas del doctor
+@csrf_exempt
+def get_active_doctor_assignments(request, doctor_id):
+    if request.method == 'GET':
+        try:
+            # Buscar todas las asignaciones activas del doctor por su ID
+            assignments = Assignment.objects.filter(doctorId=doctor_id, active=True)
+            # Verificar si se encontraron asignaciones activas para el doctor
+            if assignments.exists():
+                # Serializar las asignaciones activas
+                assignments_data = []
+                for assignment in assignments:
+                    doctor_serializer = DoctorSerializer(assignment.doctorId)
+                    user_serializer = UserSerializer(assignment.userId)
+                    assignment_data = {
+                        'id': assignment.id,
+                        'doctor': doctor_serializer.data,
+                        'user': user_serializer.data,
+                        'dateCreated': assignment.dateCreated
+                    }
+                    assignments_data.append(assignment_data)
+                return JsonResponse(assignments_data, safe=False)
+            else:
+                return JsonResponse("No se encontraron asignaciones activas para este doctor.", status=404, safe=False)
+        except Assignment.DoesNotExist:
+            return JsonResponse("No se encontraron asignaciones para este doctor.", status=404, safe=False)
+
+# Coje todas las asignaciones inactivas del doctor
+@csrf_exempt
+def get_no_active_doctor_assignments(request, doctor_id):
+    if request.method == 'GET':
+        try:
+            # Buscar todas las asignaciones inactivas del doctor por su ID
+            assignments = Assignment.objects.filter(doctorId=doctor_id, active=False)
+            # Verificar si se encontraron asignaciones inactivas para el doctor
+            if assignments.exists():
+                # Serializar las asignaciones inactivas
+                assignments_data = []
+                for assignment in assignments:
+                    doctor_serializer = DoctorSerializer(assignment.doctorId)
+                    user_serializer = UserSerializer(assignment.userId)
+                    assignment_data = {
+                        'id': assignment.id,
+                        'doctor': doctor_serializer.data,
+                        'user': user_serializer.data,
+                        'dateCreated': assignment.dateCreated
+                    }
+                    assignments_data.append(assignment_data)
+                return JsonResponse(assignments_data, safe=False)
+            else:
+                return JsonResponse("No se encontraron asignaciones inactivas para este doctor.", status=404, safe=False)
+        except Assignment.DoesNotExist:
+            return JsonResponse("No se encontraron asignaciones para este doctor.", status=404, safe=False)
 
 #Coje todas las asignaciones del usuario
 @csrf_exempt
@@ -323,6 +398,7 @@ def get_user_assignments(request, user_id):
                 user_serializer = UserSerializer(assignment.userId)
                 # Crear un diccionario con la información de cada asignación
                 assignment_data = {
+                    'id': assignment.id,
                     'doctor': doctor_serializer.data,
                     'user': user_serializer.data,
                     'dateCreated': assignment.dateCreated
@@ -337,20 +413,54 @@ def get_user_assignments(request, user_id):
 def get_active_user_assignment(request, user_id):
     if request.method == 'GET':
         try:
-            # Buscar la asignación más reciente del usuario por su ID
-            latest_assignment = Assignment.objects.filter(userId=user_id).latest('dateCreated')
-            # Serializar los objetos de Doctor y User relacionados
-            doctor_serializer = DoctorSerializer(latest_assignment.doctorId)
-            user_serializer = UserSerializer(latest_assignment.userId)
-            # Crear un diccionario con la información de la asignación más reciente
-            latest_assignment_data = {
-                'doctor': doctor_serializer.data,
-                'user': user_serializer.data,
-                'dateCreated': latest_assignment.dateCreated
-            }
-            return JsonResponse(latest_assignment_data, safe=False)
+            # Buscar todas las asignaciones activas del usuario por su ID
+            assignments = Assignment.objects.filter(userId=user_id, active=True)
+            # Verificar si se encontraron asignaciones activas para el usuario
+            if assignments.exists():
+                # Serializar las asignaciones activas
+                assignments_data = []
+                for assignment in assignments:
+                    doctor_serializer = DoctorSerializer(assignment.doctorId)
+                    user_serializer = UserSerializer(assignment.userId)
+                    assignment_data = {
+                        'id': assignment.id,
+                        'doctor': doctor_serializer.data,
+                        'user': user_serializer.data,
+                        'dateCreated': assignment.dateCreated
+                    }
+                    assignments_data.append(assignment_data)
+                return JsonResponse(assignments_data, safe=False)
+            else:
+                return JsonResponse("No se encontraron asignaciones activas para este usuario.", status=404, safe=False)
         except Assignment.DoesNotExist:
             return JsonResponse("No se encontraron asignaciones para este usuario.", status=404, safe=False)
+
+# Cojer todos las asignaciones no activas del usuario
+def get_no_active_user_assignments(request, user_id):
+    if request.method == 'GET':
+        try:
+            # Buscar todas las asignaciones inactivas del usuario por su ID
+            assignments = Assignment.objects.filter(userId=user_id, active=False)
+            # Verificar si se encontraron asignaciones inactivas para el usuario
+            if assignments.exists():
+                # Serializar las asignaciones inactivas
+                assignments_data = []
+                for assignment in assignments:
+                    doctor_serializer = DoctorSerializer(assignment.doctorId)
+                    user_serializer = UserSerializer(assignment.userId)
+                    assignment_data = {
+                        'id': assignment.id,
+                        'doctor': doctor_serializer.data,
+                        'user': user_serializer.data,
+                        'dateCreated': assignment.dateCreated
+                    }
+                    assignments_data.append(assignment_data)
+                return JsonResponse(assignments_data, safe=False)
+            else:
+                return JsonResponse("No se encontraron asignaciones inactivas para este usuario.", status=404, safe=False)
+        except Assignment.DoesNotExist:
+            return JsonResponse("No se encontraron asignaciones para este usuario.", status=404, safe=False)
+
 
 # Cambiar el campo active a True
 @csrf_exempt
@@ -375,5 +485,94 @@ def delete_assignment(request, id):
             return JsonResponse("Asignación eliminada correctamente.", status=200, safe=False)
         except Assignment.DoesNotExist:
             return JsonResponse("Asignación no encontrada.", status=404, safe=False)
+        
+#------------------------------------------END ASSIGNMENTS---------------------------------
+
+#-------------------------------------REPORTS----------------------------------------------
+
+# Añade un nuevo reporte
+@csrf_exempt
+def add_report(request):
+    if request.method == 'POST':
+        report_data = JSONParser().parse(request)
+        report_serializer = ReportSerializer(data=report_data)
+        if report_serializer.is_valid():
+            report_serializer.save()
+            return JsonResponse("Reporte añadido correctamente!", safe=False)
+        return JsonResponse("No se pudo añadir el reporte.", status=400, safe=False)
+    else:
+        return JsonResponse("Método no permitido. Se requiere un método POST.", status=405, safe=False)
+
+# Actualiza un reporte existente
+@csrf_exempt
+def update_report(request, report_id):
+    if request.method == 'PUT':
+        try:
+            report = Report.objects.get(id=report_id)
+            report_data = JSONParser().parse(request)
+            report_serializer = ReportSerializer(report, data=report_data)
+            if report_serializer.is_valid():
+                report_serializer.save()
+                return JsonResponse("Reporte actualizado correctamente!", safe=False)
+            return JsonResponse("No se pudo actualizar el reporte.", status=400, safe=False)
+        except Report.DoesNotExist:
+            return JsonResponse("Reporte no encontrado.", status=404, safe=False)
+
+# Coje todos los reportes del usuario
+@csrf_exempt
+def get_user_reports(request, user_id):
+    if request.method == 'GET':
+        try:
+            # Buscar todos los reportes del usuario por su ID
+            reports = Report.objects.filter(userId=user_id)
+            # Verificar si se encontraron reportes para el usuario
+            if reports.exists():
+                # Serializar los reportes
+                reports_data = []
+                for report in reports:
+                    doctor_serializer = DoctorSerializer(report.doctorId)
+                    user_serializer = UserSerializer(report.userId)
+                    report_data = {
+                        'id': report.id,
+                        'doctor': doctor_serializer.data,
+                        'user': user_serializer.data,
+                        'reportInfo': report.reportInfo,
+                        'dateCreated': report.dateCreated
+                    }
+                    reports_data.append(report_data)
+                return JsonResponse(reports_data, safe=False)
+            else:
+                return JsonResponse("No se encontraron reportes para este usuario.", status=404, safe=False)
+        except Report.DoesNotExist:
+            return JsonResponse("No se encontraron reportes para este usuario.", status=404, safe=False)
+
+# Coje todos los reportes del doctor
+@csrf_exempt
+def get_doctor_reports(request, doctor_id):
+    if request.method == 'GET':
+        try:
+            # Buscar todos los reportes del doctor por su ID
+            reports = Report.objects.filter(doctorId=doctor_id)
+            # Verificar si se encontraron reportes para el doctor
+            if reports.exists():
+                # Serializar los reportes
+                reports_data = []
+                for report in reports:
+                    doctor_serializer = DoctorSerializer(report.doctorId)
+                    user_serializer = UserSerializer(report.userId)
+                    report_data = {
+                        'id': report.id,
+                        'doctor': doctor_serializer.data,
+                        'user': user_serializer.data,
+                        'reportInfo': report.reportInfo,
+                        'dateCreated': report.dateCreated
+                    }
+                    reports_data.append(report_data)
+                return JsonResponse(reports_data, safe=False)
+            else:
+                return JsonResponse("No se encontraron reportes para este doctor.", status=404, safe=False)
+        except Report.DoesNotExist:
+            return JsonResponse("No se encontraron reportes para este doctor.", status=404, safe=False)
+
 
 

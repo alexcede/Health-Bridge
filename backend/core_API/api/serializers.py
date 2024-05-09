@@ -1,5 +1,11 @@
 from rest_framework import serializers
-from api.models import Admin,Doctor,User,UserSupport,Assignment,Report,Recipe
+from api.models.admin_model import Admin
+from api.models.user_model import User
+from api.models.doctor_model import Doctor
+from api.models.user_support_model import UserSupport
+from api.models.assignment_model import Assignment
+from api.models.report_model import Report
+from api.models.recipe_model import Recipe
 
 class AdminSerializer(serializers.ModelSerializer):
     class Meta:
@@ -63,31 +69,36 @@ class UserSupportSerializer(serializers.ModelSerializer):
         )
 
 class AssignmentSerializer(serializers.ModelSerializer):
-    model = Assignment
-    fields = (
-        'id',
-        'doctorId',
-        'userId',
-        'dateCreated'
-    )
+    class Meta:
+        model = Assignment
+        fields = (
+            'id',
+            'doctorId',
+            'userId',
+            'dateCreated',
+            'active'
+        )
+
     
 class ReportSerializer(serializers.ModelSerializer):
-    model = Report
-    fields = (
-        'id',
-        'doctorId',
-        'userId',
-        'reportInfo',
-        'dateCreated'
-    )
+    class meta:
+        model = Report
+        fields = (
+            'id',
+            'doctorId',
+            'userId',
+            'reportInfo',
+            'dateCreated'
+        )
     
 class RecipeSerializer(serializers.ModelSerializer):
-    model = Recipe
-    fields = (
-        'id',
-        'doctorId',
-        'userId',
-        'reportId',
-        'medicine',
-        'dateCreated'
-    )
+    class meta:
+        model = Recipe
+        fields = (
+            'id',
+            'doctorId',
+            'userId',
+            'reportId',
+            'medicine',
+            'dateCreated'
+        )

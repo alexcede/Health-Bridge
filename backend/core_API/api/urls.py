@@ -28,4 +28,22 @@ urlpatterns = [
     path('user_support/add', views.add_user_support),
     path('user_support/update/<int:id>', views.update_user_support),
     path('user_support/delete/<int:id>', views.delete_user_support),
+    
+    # URL's para las asignaciones
+    
+    # Endpoints para las asignaciones
+    path('assignments/add/', views.add_assignment),  
+    path('assignments/<int:id>/', views.get_assignment),  
+    path('assignments/activate/<int:id>/', views.activate_assignment), 
+    path('assignments/delete/<int:id>/', views.delete_assignment),  
+    
+    # Endpoints para las asignaciones del doctor
+    path('doctor/assignments/<int:doctor_id>/', views.get_doctor_assignments),  
+    path('doctor/assignments/active/<int:doctor_id>/', views.get_active_doctor_assignments),  
+    path('doctor/assignments/no-active/<int:doctor_id>/', views.get_no_active_doctor_assignments),  
+    
+    # Endpoints para las asignaciones del usuario
+    path('user/assignments/<int:user_id>/', views.get_user_assignments),
+    path('user/assignments/active/<int:user_id>/', views.get_active_user_assignment),
+    path('user/assignments/no-active/<int:user_id>/', views.get_no_active_user_assignments),
 ]
