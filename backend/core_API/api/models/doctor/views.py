@@ -85,7 +85,7 @@ def delete_doctor(request, id):
         except Doctor.DoesNotExist:
             return JsonResponse("Doctor no encontrado.", status=404, safe=False)
         
-#                     //ASIGNACIONES
+#--------------------------------ASIGNACIONES---------------------------------------------------
 
 # Coje todas las asignaciones del doctor
 @csrf_exempt
@@ -164,3 +164,34 @@ def get_no_active_doctor_assignments(request, doctor_id):
                 return JsonResponse("No se encontraron asignaciones inactivas para este doctor.", status=404, safe=False)
         except Assignment.DoesNotExist:
             return JsonResponse("No se encontraron asignaciones para este doctor.", status=404, safe=False)
+        
+#-----------------------------------------REPORTES----------------------------------------
+
+# Coje todos los reportes del doctor
+@csrf_exempt
+def get_doctor_reports(request, doctor_id):
+    from api.models.report.model import Report
+    if request.method == 'GET':
+        try:
+            # Buscar todos los reportes del doctor por su ID
+            reports = Report.objects.filter(doctorId=doctor_id)
+            # Verificar si se encontraron reportes para el doctor
+            if reports.exists():
+                # Serializar los reportes
+                reports_data = []
+                for report in reports:
+                    doctor_serializer = DoctorSerializer(report.doctorId)
+                    user_serializer = UserSerializer(report.userId)
+                    report_data = {
+                        'id': report.id,
+                        'doctor': doctor_serializer.data,
+                        'user': user_serializer.data,
+                        'reportInfo': report.reportInfo,
+                        'dateCreated': report.dateCreated
+                    }
+                    reports_data.append(report_data)
+                return JsonResponse(reports_data, safe=False)
+            else:
+                return JsonResponse("No se encontraron reportes para este doctor.", status=404, safe=False)
+        except Report.DoesNotExist:
+            return JsonResponse("No se encontraron reportes para este doctor.", status=404, safe=False)

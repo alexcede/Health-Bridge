@@ -4,8 +4,7 @@ from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
 from .model import User
 from .serializer import UserSerializer
-from api.models.assignment.model import Assignment
-from api.models.doctor.serializer import DoctorSerializer
+
 
 # Coje a todos los usuarios de la base de datos
 @csrf_exempt
@@ -90,6 +89,8 @@ def delete_user(request, id):
 #Coje todas las asignaciones del usuario
 @csrf_exempt
 def get_user_assignments(request, user_id):
+    from api.models.assignment.model import Assignment
+    from api.models.doctor.serializer import DoctorSerializer
     if request.method == 'GET':
         try:
             # Buscar todas las asignaciones del usuario por su ID
@@ -114,6 +115,8 @@ def get_user_assignments(request, user_id):
 # Coje la ultima asignacion del
 @csrf_exempt
 def get_active_user_assignment(request, user_id):
+    from api.models.assignment.model import Assignment
+    from api.models.doctor.serializer import DoctorSerializer
     if request.method == 'GET':
         try:
             # Buscar todas las asignaciones activas del usuario por su ID
@@ -140,6 +143,8 @@ def get_active_user_assignment(request, user_id):
 
 # Cojer todos las asignaciones no activas del usuario
 def get_no_active_user_assignments(request, user_id):
+    from api.models.assignment.model import Assignment
+    from api.models.doctor.serializer import DoctorSerializer
     if request.method == 'GET':
         try:
             # Buscar todas las asignaciones inactivas del usuario por su ID
@@ -163,3 +168,35 @@ def get_no_active_user_assignments(request, user_id):
                 return JsonResponse("No se encontraron asignaciones inactivas para este usuario.", status=404, safe=False)
         except Assignment.DoesNotExist:
             return JsonResponse("No se encontraron asignaciones para este usuario.", status=404, safe=False)
+        
+#                                 REPORTES
+
+# Coje todos los reportes del usuario
+@csrf_exempt
+def get_user_reports(request, user_id):
+    from api.models.report.model import Report
+    from api.models.doctor.serializer import DoctorSerializer
+    if request.method == 'GET':
+        try:
+            # Buscar todos los reportes del usuario por su ID
+            reports = Report.objects.filter(userId=user_id)
+            # Verificar si se encontraron reportes para el usuario
+            if reports.exists():
+                # Serializar los reportes
+                reports_data = []
+                for report in reports:
+                    doctor_serializer = DoctorSerializer(report.doctorId)
+                    user_serializer = UserSerializer(report.userId)
+                    report_data = {
+                        'id': report.id,
+                        'doctor': doctor_serializer.data,
+                        'user': user_serializer.data,
+                        'reportInfo': report.reportInfo,
+                        'dateCreated': report.dateCreated
+                    }
+                    reports_data.append(report_data)
+                return JsonResponse(reports_data, safe=False)
+            else:
+                return JsonResponse("No se encontraron reportes para este usuario.", status=404, safe=False)
+        except Report.DoesNotExist:
+            return JsonResponse("No se encontraron reportes para este usuario.", status=404, safe=False)

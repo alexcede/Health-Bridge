@@ -10,6 +10,6 @@ urlpatterns = [
     path('user_support/', include('api.models.user_support.urls')),
     # URL para las asignaciones
     path('assignment/', include('api.models.assignment.urls')), 
-    
-
+    # URL para los reportes
+    path('report/', include('api.models.report.urls')),
 ]
