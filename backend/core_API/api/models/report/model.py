@@ -1,6 +1,6 @@
 from django.db import models
-from api.models.doctor_model import Doctor
-from api.models.user_model import User
+from api.models.doctor.model import Doctor
+from api.models.user.model import User
 
 class Report(models.Model):
     id = models.AutoField(primary_key=True)

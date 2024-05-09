@@ -1,13 +1,13 @@
 from django_seed import Seed
 from faker import Faker
 from django.contrib.auth.hashers import make_password
-from api.models.admin_model import Admin
-from api.models.user_model import User
-from api.models.doctor_model import Doctor
-from api.models.user_support_model import UserSupport
-from api.models.assignment_model import Assignment
-from api.models.report_model import Report
-from api.models.recipe_model import Recipe
+from api.models.admin.model import Admin
+from api.models.user.model import User
+from api.models.doctor.model import Doctor
+from api.models.user_support.model import UserSupport
+from api.models.assignment.model import Assignment
+from api.models.report.model import Report
+from api.models.recipe.model import Recipe
 
 seeder = Seed.seeder(locale='es_ES')
 faker = Faker(locale='es_ES')
