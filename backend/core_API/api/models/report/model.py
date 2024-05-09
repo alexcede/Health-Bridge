@@ -6,5 +6,7 @@ class Report(models.Model):
     id = models.AutoField(primary_key=True)
     doctorId = models.ForeignKey(Doctor, on_delete=models.PROTECT)
     userId = models.ForeignKey(User, on_delete=models.PROTECT)
+    reportName = models.CharField(max_length=255, default="Informe medico")
+    disease = models.CharField(max_length=255, default=None)
     reportInfo = models.CharField(max_length=255)
     dateCreated = models.DateTimeField(auto_now_add=True)

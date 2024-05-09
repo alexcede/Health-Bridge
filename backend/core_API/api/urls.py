@@ -11,4 +11,6 @@ urlpatterns = [
     path('assignment/', include('api.models.assignment.urls')), 
     # URL para los reportes
     path('report/', include('api.models.report.urls')),
+    # URL para las recetas
+    path('recipe/', include('api.models.recipe.urls'))
 ]

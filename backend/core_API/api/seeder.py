@@ -72,6 +72,8 @@ seeder.add_entity(Assignment, 10, {
 seeder.add_entity(Report, 10, {
     'doctorId': lambda x: Doctor.objects.order_by('?').first(),
     'userId': lambda x: User.objects.order_by('?').first(),
+    'reportName': faker.word(),
+    'disease': faker.word(),
     'reportInfo': faker.text(),
 })
 
