@@ -6,8 +6,8 @@ class ReportSerializer(serializers.ModelSerializer):
         model = Report
         fields = (
             'id',
-            'doctorId',
-            'userId',
+            'doctor',
+            'user',
             'reportName',
             'disease',
             'reportInfo',

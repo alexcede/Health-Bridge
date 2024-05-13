@@ -19,8 +19,8 @@ def add_assignment(request):
             assignment_data = JSONParser().parse(request)
             
             # Obtener el ID del doctor y del usuario de los datos de la solicitud
-            doctor_id = assignment_data.get('doctorId')
-            user_id = assignment_data.get('userId')
+            doctor_id = assignment_data.get('doctor')
+            user_id = assignment_data.get('user')
 
             # Verificar si el doctor y el usuario existen en la base de datos
             doctor = Doctor.objects.get(id=doctor_id)
@@ -50,8 +50,8 @@ def get_assignment(request, id):
             # Buscar la asignación por su ID
             assignment = Assignment.objects.get(id=id)
             # Serializar los objetos de Doctor y User relacionados
-            doctor_serializer = DoctorSerializer(assignment.doctorId)
-            user_serializer = UserSerializer(assignment.userId)
+            doctor_serializer = DoctorSerializer(assignment.doctor)
+            user_serializer = UserSerializer(assignment.user)
             # Crear un diccionario con la información
             assignment_data = {
                 'id': assignment.id,

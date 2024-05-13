@@ -94,12 +94,12 @@ def get_user_assignments(request, user_id):
     if request.method == 'GET':
         try:
             # Buscar todas las asignaciones del usuario por su ID
-            assignments = Assignment.objects.filter(userId=user_id)
+            assignments = Assignment.objects.filter(user=user_id)
             # Serializar los objetos de Doctor y User relacionados
             assignments_data = []
             for assignment in assignments:
-                doctor_serializer = DoctorSerializer(assignment.doctorId)
-                user_serializer = UserSerializer(assignment.userId)
+                doctor_serializer = DoctorSerializer(assignment.doctor)
+                user_serializer = UserSerializer(assignment.user)
                 # Crear un diccionario con la información de cada asignación
                 assignment_data = {
                     'id': assignment.id,
@@ -120,14 +120,14 @@ def get_active_user_assignment(request, user_id):
     if request.method == 'GET':
         try:
             # Buscar todas las asignaciones activas del usuario por su ID
-            assignments = Assignment.objects.filter(userId=user_id, active=True)
+            assignments = Assignment.objects.filter(user=user_id, active=True)
             # Verificar si se encontraron asignaciones activas para el usuario
             if assignments.exists():
                 # Serializar las asignaciones activas
                 assignments_data = []
                 for assignment in assignments:
-                    doctor_serializer = DoctorSerializer(assignment.doctorId)
-                    user_serializer = UserSerializer(assignment.userId)
+                    doctor_serializer = DoctorSerializer(assignment.doctor)
+                    user_serializer = UserSerializer(assignment.user)
                     assignment_data = {
                         'id': assignment.id,
                         'doctor': doctor_serializer.data,
@@ -148,14 +148,14 @@ def get_no_active_user_assignments(request, user_id):
     if request.method == 'GET':
         try:
             # Buscar todas las asignaciones inactivas del usuario por su ID
-            assignments = Assignment.objects.filter(userId=user_id, active=False)
+            assignments = Assignment.objects.filter(user=user_id, active=False)
             # Verificar si se encontraron asignaciones inactivas para el usuario
             if assignments.exists():
                 # Serializar las asignaciones inactivas
                 assignments_data = []
                 for assignment in assignments:
-                    doctor_serializer = DoctorSerializer(assignment.doctorId)
-                    user_serializer = UserSerializer(assignment.userId)
+                    doctor_serializer = DoctorSerializer(assignment.doctor)
+                    user_serializer = UserSerializer(assignment.user)
                     assignment_data = {
                         'id': assignment.id,
                         'doctor': doctor_serializer.data,
@@ -179,14 +179,14 @@ def get_user_reports(request, user_id):
     if request.method == 'GET':
         try:
             # Buscar todos los reportes del usuario por su ID
-            reports = Report.objects.filter(userId=user_id)
+            reports = Report.objects.filter(user=user_id)
             # Verificar si se encontraron reportes para el usuario
             if reports.exists():
                 # Serializar los reportes
                 reports_data = []
                 for report in reports:
-                    doctor_serializer = DoctorSerializer(report.doctorId)
-                    user_serializer = UserSerializer(report.userId)
+                    doctor_serializer = DoctorSerializer(report.doctor)
+                    user_serializer = UserSerializer(report.user)
                     report_data = {
                         'id': report.id,
                         'doctor': doctor_serializer.data,

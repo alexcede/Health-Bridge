@@ -8,6 +8,7 @@ from api.models.user_support.model import UserSupport
 from api.models.assignment.model import Assignment
 from api.models.report.model import Report
 from api.models.recipeInfo.model import RecipeInfo
+from api.models.recipe.model import Recipe
 from api.models.medicine.model import Medicine
 
 seeder = Seed.seeder(locale='es_ES')
@@ -64,15 +65,15 @@ seeder.add_entity(UserSupport, 10, {
 
 # Seed para la tabla Assignment (Nota: Asegúrate de tener al menos 10 Doctores y 10 Usuarios en la base de datos antes de ejecutar este seeder)
 seeder.add_entity(Assignment, 10, {
-    'doctorId': lambda x: Doctor.objects.order_by('?').first(),
-    'userId': lambda x: User.objects.order_by('?').first(),
+    'doctor': lambda x: Doctor.objects.order_by('?').first(),
+    'user': lambda x: User.objects.order_by('?').first(),
     'active': True
 })
 
 # Seed para la tabla Report (Nota: Asegúrate de tener al menos 10 Doctores y 10 Usuarios en la base de datos antes de ejecutar este seeder)
 seeder.add_entity(Report, 10, {
-    'doctorId': lambda x: Doctor.objects.order_by('?').first(),
-    'userId': lambda x: User.objects.order_by('?').first(),
+    'doctor': lambda x: Doctor.objects.order_by('?').first(),
+    'user': lambda x: User.objects.order_by('?').first(),
     'reportName': faker.word(),
     'disease': faker.word(),
     'reportInfo': faker.text(),
@@ -80,22 +81,28 @@ seeder.add_entity(Report, 10, {
 
 # Seed para la tabla RecipeInfo
 seeder.add_entity(RecipeInfo, 10, {
-    'doctorId': lambda x: Doctor.objects.order_by('?').first(),
-    'userId': lambda x: User.objects.order_by('?').first(),
-    'reportId': lambda x: Report.objects.order_by('?').first(),
-    'medicineIds': [Medicine.objects.order_by('?').first().id for _ in range(seeder.faker.random_int(min=1, max=5))],  # Lista de IDs de medicamentos aleatorios
-    'dateFinish': seeder.faker.date_time_between(start_date='-30d', end_date='+30d'),
-    'active': True
-})
-
+        'user': lambda x: User.objects.order_by('?').first(),
+        'doctor': lambda x: Doctor.objects.order_by('?').first(),
+        'report': lambda x: Report.objects.order_by('?').first(),
+        'dateFinish': lambda x: faker.date_time_this_year(),
+        'active': True
+    }
+)
 # Seed para la tabla Medicine
 seeder.add_entity(Medicine, 10, {
-    'name': 'Nombre del medicamento',
-    'morningDosis': faker.random_element(elements=(1, 0.5, 0)),
-    'noonDosis': faker.random_element(elements=(1, 0.5, 0)),
-    'nightDosis': faker.random_element(elements=(1, 0.5, 0)),
-    'RecipeInfos': lambda x: [RecipeInfo.objects.order_by('?').first() for _ in range(faker.random_int(min=1, max=5))],
-})
+        'name': lambda x: faker.word(),
+        'dosis': lambda x: faker.random_number(digits=1),
+    }
+)
 
+seeder.add_entity(Recipe, 10, {
+        'recipeInfo': lambda x: lambda x: RecipeInfo.objects.order_by('?').first(),
+        'medicine': lambda x: Medicine.objects.order_by('?').first(),
+        'morning_dose': lambda x: faker.random_element([1, 0.5, 0]),
+        'noon_dose': lambda x: faker.random_element([1, 0.5, 0]),
+        'night_dose': lambda x: faker.random_element([1, 0.5, 0]),
+        'active': True
+    }
+)
 # Ejecutar los seeders
 seeder.execute()

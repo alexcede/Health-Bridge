@@ -42,10 +42,10 @@ def update_report(request, report_id):
         if 'reportInfo' in report_data:
             report.reportInfo = report_data['reportInfo']
             # Actualizar otros campos si están presentes en los datos proporcionados
-            if 'doctorId' in report_data:
-                report.doctorId = report_data['doctorId']
-            if 'userId' in report_data:
-                report.userId = report_data['userId']
+            if 'doctor' in report_data:
+                report.doctor = report_data['doctor']
+            if 'user' in report_data:
+                report.user = report_data['user']
             if 'reportName' in report_data:
                 report.reportName = report_data['reportName']
             if 'disease' in report_data:

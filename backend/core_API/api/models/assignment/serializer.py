@@ -6,8 +6,8 @@ class AssignmentSerializer(serializers.ModelSerializer):
         model = Assignment
         fields = (
             'id',
-            'doctorId',
-            'userId',
+            'doctor',
+            'user',
             'dateCreated',
             'active'
         )
