@@ -8,6 +8,7 @@ class Recipe(models.Model):
     doctorId = models.ForeignKey(Doctor, on_delete=models.PROTECT)
     userId = models.ForeignKey(User, on_delete=models.PROTECT)
     reportId = models.ForeignKey(Report, on_delete=models.PROTECT)
-    medicine = models.CharField(max_length=255)
+    medicines = models.JSONField(blank=True, null=True)
+    dateFinish = models.DateTimeField(default=None)
     dateCreated = models.DateTimeField(auto_now_add=True)
     active = models.BooleanField(default=True)
