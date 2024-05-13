@@ -8,7 +8,14 @@ class Command(BaseCommand):
         from django_seed import Seed
         from faker import Faker
         from django.contrib.auth.hashers import make_password
-        from api.models import Admin, Doctor, User, UserSupport, Assignment, Report, Recipe
+        from api.models.admin.model import Admin
+        from api.models.doctor.model import Doctor
+        from api.models.user.model import User
+        from api.models.user_support.model import UserSupport
+        from api.models.assignment.model import Assignment
+        from api.models.report.model import Report
+        from api.models.recipeInfo.model import RecipeInfo
+        from api.models.medicine.model import Medicine
 
         seeder = Seed.seeder(locale='es_ES')
         faker = Faker('es_ES')
@@ -77,8 +84,8 @@ class Command(BaseCommand):
             'dateCreated': faker.date_time_this_year()
         })
 
-        # Seed para la tabla Recipe 
-        seeder.add_entity(Recipe, 10, {
+        # Seed para la tabla RecipeInfo 
+        seeder.add_entity(RecipeInfo, 10, {
             'doctorId': lambda x: Doctor.objects.order_by('?').first(),
             'userId': lambda x: User.objects.order_by('?').first(),
             'reportId': lambda x: Report.objects.order_by('?').first(),

@@ -7,7 +7,7 @@ from api.models.doctor.model import Doctor
 from api.models.user_support.model import UserSupport
 from api.models.assignment.model import Assignment
 from api.models.report.model import Report
-from api.models.recipe.model import Recipe
+from api.models.recipeInfo.model import RecipeInfo
 from api.models.medicine.model import Medicine
 
 seeder = Seed.seeder(locale='es_ES')
@@ -78,8 +78,8 @@ seeder.add_entity(Report, 10, {
     'reportInfo': faker.text(),
 })
 
-# Seed para la tabla Recipe
-seeder.add_entity(Recipe, 10, {
+# Seed para la tabla RecipeInfo
+seeder.add_entity(RecipeInfo, 10, {
     'doctorId': lambda x: Doctor.objects.order_by('?').first(),
     'userId': lambda x: User.objects.order_by('?').first(),
     'reportId': lambda x: Report.objects.order_by('?').first(),
@@ -94,7 +94,7 @@ seeder.add_entity(Medicine, 10, {
     'morningDosis': faker.random_element(elements=(1, 0.5, 0)),
     'noonDosis': faker.random_element(elements=(1, 0.5, 0)),
     'nightDosis': faker.random_element(elements=(1, 0.5, 0)),
-    'recipes': lambda x: [Recipe.objects.order_by('?').first() for _ in range(faker.random_int(min=1, max=5))],
+    'RecipeInfos': lambda x: [RecipeInfo.objects.order_by('?').first() for _ in range(faker.random_int(min=1, max=5))],
 })
 
 # Ejecutar los seeders

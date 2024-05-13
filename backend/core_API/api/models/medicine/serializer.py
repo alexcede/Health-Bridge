@@ -7,8 +7,5 @@ class MedicineSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'name',
-            'morningDosis',
-            'noonDosis',
-            'nightDosis',
-            'recipeId'
+            'dosis',
         )

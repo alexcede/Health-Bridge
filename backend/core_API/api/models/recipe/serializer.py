@@ -2,13 +2,14 @@ from rest_framework import serializers
 from .model import Recipe
 
 class RecipeSerializer(serializers.ModelSerializer):
-    class meta:
+    class Meta:
         model = Recipe
         fields = (
             'id',
-            'doctorId',
-            'userId',
-            'reportId',
+            'name',
             'medicine',
-            'dateCreated'
+            'morning_dose',
+            'noon_dose',
+            'night_dose',
+            'active'
         )

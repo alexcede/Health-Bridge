@@ -9,6 +9,7 @@ from api.models.user_support.model import UserSupport
 from api.models.assignment.model import Assignment
 from api.models.report.model import Report
 from api.models.recipe.model import Recipe
+from api.models.recipeInfo.model import RecipeInfo
 
 admin.site.register(Admin)
 admin.site.register(Doctor)
@@ -17,3 +18,4 @@ admin.site.register(UserSupport)
 admin.site.register(Assignment)
 admin.site.register(Report)
 admin.site.register(Recipe)
+admin.site.register(RecipeInfo)

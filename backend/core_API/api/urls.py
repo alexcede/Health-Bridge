@@ -12,5 +12,5 @@ urlpatterns = [
     # URL para los reportes
     path('report/', include('api.models.report.urls')),
     # URL para las recetas
-    path('recipe/', include('api.models.recipe.urls'))
+    path('recipeInfo/', include('api.models.recipeInfo.urls'))
 ]
