@@ -5,7 +5,10 @@ from django.http.response import JsonResponse
 from .model import User
 from .serializer import UserSerializer
 
-
+from django.core.files.storage import default_storage
+from django.conf import settings
+import os
+import bcrypt
 # Coje a todos los usuarios de la base de datos
 @csrf_exempt
 def get_all_users(request):
@@ -51,12 +54,41 @@ def get_no_active_users(request):
 @csrf_exempt
 def add_user(request):
     if request.method == 'POST':
-        user_data = JSONParser().parse(request)
+        # Obtener la ruta base de la carpeta de medios
+        media_root = settings.MEDIA_ROOT
+        # Acceder a los datos de formulario y archivos adjuntos en la solicitud POST
+        user_data = request.POST.copy()
+        file = request.FILES.get('photo', None)
+        
+        # Hashear la contraseña
+        raw_password = user_data.get('password', '')  
+        hashed_password = bcrypt.hashpw(raw_password.encode('utf-8'), bcrypt.gensalt())
+
+        # Reemplazar la contraseña en texto plano por la contraseña hasheada en los datos del user
+        user_data['password'] = hashed_password.decode('utf-8')
+        
+        # Guardar la foto y obtener su ruta
+        if file:
+            file_extension = file.name.split('.')[-1]  # Obtener la extensión del archivo
+            new_file_name = f"{user_data.get('dni')}.{file_extension}"  # Construir el nuevo nombre del archivo
+            # Guardar el archivo en el directorio de medios
+            file_path = os.path.join(settings.MEDIA_ROOT, 'users', new_file_name)
+            with default_storage.open(file_path, 'wb+') as destination:
+                for chunk in file.chunks():
+                    destination.write(chunk)
+            # Actualizar el campo 'photo' del user con la ruta de la foto guardada
+            file_path_photo = '/backend/core_API/media/users/' + new_file_name
+            user_data['photo'] = file_path_photo
+        else:
+            file_path_photo = '/backend/core_API/media/default.jpg'
+            user_data['photo'] = file_path_photo
+        
+        # Serializar y guardar los datos del user
         user_serializer = UserSerializer(data=user_data)
         if user_serializer.is_valid():
             user_serializer.save()
             return JsonResponse("Se ha añadido correctamente!", safe=False)
-        return JsonResponse("No se ha podido añadir al usuario.", status=400, safe=False)
+        return JsonResponse("No se ha podido añadir al user.", status=400, safe=False)
     else:
         return JsonResponse("Método no permitido. Se requiere un método POST.", status=405, safe=False)
 

@@ -6,10 +6,10 @@ class RecipeInfoSerializer(serializers.ModelSerializer):
         model = RecipeInfo
         fields = (
             'id',
-            'doctor',
-            'user',
-            'report',
-            'dateFinish',
-            'dateCreated',
+            'recipe',
+            'medicine',
+            'morning_dose',
+            'noon_dose',
+            'night_dose',
             'active'
         )

@@ -7,6 +7,11 @@ from .serializer import DoctorSerializer
 from api.models.assignment.model import Assignment
 from api.models.user.serializer import UserSerializer
 
+from django.core.files.storage import default_storage
+from django.conf import settings
+import os
+import bcrypt
+
 #Coje a todos los doctores de la base de datos
 @csrf_exempt
 def get_all_doctors(request):
@@ -51,8 +56,37 @@ def get_no_active_doctors(request):
 # Añade un doctor
 @csrf_exempt
 def add_doctor(request):
+    from pathlib import Path
     if request.method == 'POST':
-        doctor_data = JSONParser().parse(request)
+        # Acceder a los datos de formulario y archivos adjuntos en la solicitud POST
+        doctor_data = request.POST.copy()
+        file = request.FILES.get('photo', None)
+
+        # Hashear la contraseña
+        raw_password = doctor_data.get('password', '')  
+        hashed_password = bcrypt.hashpw(raw_password.encode('utf-8'), bcrypt.gensalt())
+
+        # Reemplazar la contraseña en texto plano por la contraseña hasheada en los datos del doctor
+        doctor_data['password'] = hashed_password.decode('utf-8')
+
+        # Guardar la foto y obtener su ruta
+        if file:
+            file_extension = file.name.split('.')[-1]  # Obtener la extensión del archivo
+            new_file_name = f"{doctor_data.get('dni')}.{file_extension}"  # Construir el nuevo nombre del archivo
+            # Guardar el archivo en el directorio de medios
+            # file_path = '/backend/core_API/media/doctors/' + new_file_name
+            file_path = os.path.join(settings.MEDIA_ROOT, 'doctors', new_file_name)
+            with default_storage.open(file_path, 'wb+') as destination:
+                for chunk in file.chunks():
+                    destination.write(chunk)
+            # Actualizar el campo 'photo' del doctor con la ruta de la foto guardada
+            file_path_photo = '/backend/core_API/media/doctors/' + new_file_name
+            doctor_data['photo'] = file_path_photo
+        else:
+            file_path_photo = '/backend/core_API/media/default.jpg'
+            doctor_data['photo'] = file_path_photo
+            
+        # Serializar y guardar los datos del doctor
         doctor_serializer = DoctorSerializer(data=doctor_data)
         if doctor_serializer.is_valid():
             doctor_serializer.save()

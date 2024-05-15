@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import RegexValidator
 
 class Doctor(models.Model):
     id = models.AutoField(primary_key=True)
@@ -8,16 +9,18 @@ class Doctor(models.Model):
     )
     password = models.CharField(max_length=255)
     dni = models.CharField(
-        max_length=12,
-        unique=True
+        max_length=9,
+        validators=[RegexValidator(r'^[0-9]{8}[a-zA-Z]$', message="El DNI debe tener el formato 12345678X.")],
+        unique=True,
     )
     photo = models.CharField(max_length=255)
     name = models.CharField(max_length=100)
     firstSurname = models.CharField(max_length=255)
     secondSurname = models.CharField(max_length=255)
     phoneNumber = models.CharField(
-        max_length=20,  # Longitud máxima del número de teléfono
-        unique=True
+        max_length=20,
+        validators=[RegexValidator(r'^\d{9,15}$', message="El número de teléfono debe tener entre 9 y 15 dígitos.")],
+        unique=True,
     )
     active = models.BooleanField(default=True)
     
