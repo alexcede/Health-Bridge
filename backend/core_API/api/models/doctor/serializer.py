@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .model import Doctor
-
 class DoctorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Doctor
@@ -13,6 +12,6 @@ class DoctorSerializer(serializers.ModelSerializer):
             'name',
             'firstSurname',
             'secondSurname',
-            'phoneNumber',
+            'phoneNumber',  
             'active'
         )

@@ -9,6 +9,9 @@ from django.core.files.storage import default_storage
 from django.conf import settings
 import os
 import bcrypt
+from rest_framework.decorators import api_view
+
+from django.core.exceptions import ValidationError
 # Coje a todos los usuarios de la base de datos
 @csrf_exempt
 def get_all_users(request):
@@ -53,6 +56,7 @@ def get_no_active_users(request):
 # Añade un usuario
 @csrf_exempt
 def add_user(request):
+    from api.fields_validator import validate_unique_fields
     if request.method == 'POST':
         # Obtener la ruta base de la carpeta de medios
         media_root = settings.MEDIA_ROOT
@@ -66,7 +70,15 @@ def add_user(request):
 
         # Reemplazar la contraseña en texto plano por la contraseña hasheada en los datos del user
         user_data['password'] = hashed_password.decode('utf-8')
-        
+        try:
+            # Ejecutar la validación de campos únicos
+            unique_errors = validate_unique_fields(user_data)
+            if unique_errors:
+                return JsonResponse({"error": unique_errors}, status=400)
+        except ValidationError as e:
+            # Capturar errores de validación y devolverlos en formato JSON
+            return JsonResponse({"error": e.message_dict}, status=400)
+
         # Guardar la foto y obtener su ruta
         if file:
             file_extension = file.name.split('.')[-1]  # Obtener la extensión del archivo
@@ -94,15 +106,58 @@ def add_user(request):
 
 # Actualiza el usuario elegido
 @csrf_exempt
+@api_view(['PUT'])
 def update_user(request, id):
+    from api.fields_validator import validate_unique_fields
     if request.method == 'PUT':
-        user_data = JSONParser().parse(request)
-        user = User.objects.get(id=id)
-        serializer = UserSerializer(user, data=user_data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse("Se ha actualizado el usuario correctamente!", safe=False)
-        return JsonResponse("No se ha podido actualizar al usuario.", safe=False)
+        # Verificar si se están actualizando campos únicos
+        user_data = request.data.copy()
+        try:
+            # Ejecutar la validación de campos únicos
+            unique_errors = validate_unique_fields(user_data)
+            if unique_errors:
+                return JsonResponse({"error": unique_errors}, status=400, safe=False)
+        except ValidationError as e:
+            # Capturar errores de validación y devolverlos en formato JSON
+            return JsonResponse({"error": e.message_dict}, status=400, safe=False)
+
+        try:
+            # Obtener el usuario existente
+            user = User.objects.get(id=id)
+
+            # Verificar si se está actualizando la foto
+            file = request.FILES.get('photo')
+            if file:
+                file_extension = file.name.split('.')[-1]
+                if user_data.get('dni') is None:
+                    new_file_name = f"{user.dni}.{file_extension}"
+                else:
+                    new_file_name = f"{user_data.get('dni')}.{file_extension}"
+
+                # Eliminar el archivo anterior asociado al antiguo DNI del usuario
+                old_file_name = f"{user.dni}.{file_extension}"
+                old_file_path = os.path.join(settings.MEDIA_ROOT, 'users', old_file_name)
+                if os.path.exists(old_file_path):
+                    os.remove(old_file_path)
+
+                # Guardar el nuevo archivo
+                file_path = os.path.join(settings.MEDIA_ROOT, 'users', new_file_name)
+                with default_storage.open(file_path, 'wb+') as destination:
+                    for chunk in file.chunks():
+                        destination.write(chunk)
+                file_path_photo = '/backend/core_API/media/users/' + new_file_name
+                user_data['photo'] = file_path_photo
+
+            # Serializar y guardar los datos actualizados del usuario
+            serializer = UserSerializer(user, data=user_data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse("Se ha actualizado el usuario correctamente!", status=200, safe=False)
+            return JsonResponse(serializer.errors, status=400, safe=False)
+        except User.DoesNotExist:
+            return JsonResponse("No se ha encontrado el usuario especificado.", status=400, safe=False)
+    else:
+        return JsonResponse("Método no permitido. Se requiere un método PUT.", status=405, safe=False)
 
 # Cambia el estado del campo active a false de un usuario
 @csrf_exempt

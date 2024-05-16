@@ -5,3 +5,6 @@ from django.http.response import JsonResponse
 from .model import Admin
 from .serializer import AdminSerializer
 
+from django.core.exceptions import ValidationError
+from api.fields_validator import validate_unique_fields
+

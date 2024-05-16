@@ -7,10 +7,12 @@ from .serializer import DoctorSerializer
 from api.models.assignment.model import Assignment
 from api.models.user.serializer import UserSerializer
 
+from rest_framework.decorators import api_view
 from django.core.files.storage import default_storage
 from django.conf import settings
 import os
 import bcrypt
+from django.core.exceptions import ValidationError
 
 #Coje a todos los doctores de la base de datos
 @csrf_exempt
@@ -56,9 +58,9 @@ def get_no_active_doctors(request):
 # Añade un doctor
 @csrf_exempt
 def add_doctor(request):
-    from pathlib import Path
+    from api.fields_validator import validate_unique_fields
     if request.method == 'POST':
-        # Acceder a los datos de formulario y archivos adjuntos en la solicitud POST
+        # Obtener datos del formulario y archivo adjunto en la solicitud POST
         doctor_data = request.POST.copy()
         file = request.FILES.get('photo', None)
 
@@ -69,12 +71,20 @@ def add_doctor(request):
         # Reemplazar la contraseña en texto plano por la contraseña hasheada en los datos del doctor
         doctor_data['password'] = hashed_password.decode('utf-8')
 
+        try:
+            # Ejecutar la validación de campos únicos
+            unique_errors = validate_unique_fields(doctor_data)
+            if unique_errors:
+                return JsonResponse({"error": unique_errors}, status=400)
+        except ValidationError as e:
+            # Capturar errores de validación y devolverlos en formato JSON
+            return JsonResponse({"error": e.message_dict}, status=400)
+        
         # Guardar la foto y obtener su ruta
         if file:
             file_extension = file.name.split('.')[-1]  # Obtener la extensión del archivo
             new_file_name = f"{doctor_data.get('dni')}.{file_extension}"  # Construir el nuevo nombre del archivo
             # Guardar el archivo en el directorio de medios
-            # file_path = '/backend/core_API/media/doctors/' + new_file_name
             file_path = os.path.join(settings.MEDIA_ROOT, 'doctors', new_file_name)
             with default_storage.open(file_path, 'wb+') as destination:
                 for chunk in file.chunks():
@@ -85,27 +95,65 @@ def add_doctor(request):
         else:
             file_path_photo = '/backend/core_API/media/default.jpg'
             doctor_data['photo'] = file_path_photo
-            
+        
         # Serializar y guardar los datos del doctor
         doctor_serializer = DoctorSerializer(data=doctor_data)
         if doctor_serializer.is_valid():
             doctor_serializer.save()
             return JsonResponse("Se ha añadido correctamente!", safe=False)
-        return JsonResponse("No se ha podido añadir al doctor.", status=400, safe=False)
+        else:
+            return JsonResponse(doctor_serializer.errors, status=400)
     else:
-        return JsonResponse("Método no permitido. Se requiere un método POST.", status=405, safe=False)
+        return JsonResponse("Método no permitido. Se requiere un método POST.", status=405)
 
 # Actualiza el medico elegido
 @csrf_exempt
+@api_view(['PUT'])
 def update_doctor(request, id):
+    from api.fields_validator import validate_unique_fields
+    
     if request.method == 'PUT':
-        doctor_data = JSONParser().parse(request)
-        doctor = Doctor.objects.get(id=id)
-        serializer = DoctorSerializer(doctor, data=doctor_data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse("Se ha actualizado el doctor correctamente!", safe=False)
-        return JsonResponse("No se ha podido actualizar al doctor.", safe=False)
+        # Verificar si se están actualizando campos únicos
+        doctor_data = request.data.copy()  
+        try:
+            # Ejecutar la validación de campos únicos
+            unique_errors = validate_unique_fields(doctor_data)
+            if unique_errors:
+                return JsonResponse({"error": unique_errors}, status=400)
+        except ValidationError as e:
+            # Capturar errores de validación y devolverlos en formato JSON
+            return JsonResponse({"error": e.message_dict}, status=400)
+
+        try:
+            # Obtener el doctor existente
+            doctor = Doctor.objects.get(id=id)
+
+            # Verificar si se está actualizando la foto
+            file = request.FILES.get('photo')
+            if file:
+                file_extension = file.name.split('.')[-1]
+                if doctor_data.get('dni') is None:
+                    new_file_name = f"{doctor.dni}.{file_extension}"
+                else:
+                    new_file_name = f"{doctor_data.get('dni')}.{file_extension}"
+
+                file_path = os.path.join(settings.MEDIA_ROOT, 'doctors', new_file_name)
+                with default_storage.open(file_path, 'wb+') as destination:
+                    for chunk in file.chunks():
+                        destination.write(chunk)
+                file_path_photo = '/backend/core_API/media/doctors/' + new_file_name
+                doctor_data['photo'] = file_path_photo
+
+            # Serializar y guardar los datos actualizados del doctor
+            serializer = DoctorSerializer(doctor, data=doctor_data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse("Se ha actualizado el doctor correctamente!", status=200, safe=False)
+            return JsonResponse(serializer.errors, status=400, safe=False)  
+        except Doctor.DoesNotExist:
+            return JsonResponse("No se ha encontrado el doctor especificado.", status=400, safe=False)
+    else:
+        return JsonResponse("Método no permitido. Se requiere un método PUT.", status=405, safe=False)
 
 # Cambia el estado del campo active a false de un doctor
 @csrf_exempt
