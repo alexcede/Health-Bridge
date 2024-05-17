@@ -7,7 +7,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'report',
-            'active',
             'dateFinish',
             'dateCreated',
+            'active',
         )

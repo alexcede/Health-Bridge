@@ -1,9 +1,9 @@
 from django.db import models
 from api.models.report.model import Report
-
+from django.utils import timezone
 class Recipe(models.Model):
     id = models.AutoField(primary_key=True)
     report = models.ForeignKey(Report,on_delete=models.PROTECT)
-    active = models.BooleanField(default=True)
     dateFinish = models.DateTimeField(default=None)
-    dateCreated = models.DateTimeField(auto_now_add=True)
+    dateCreated = models.DateTimeField(default=timezone.now, editable=False)
+    active = models.BooleanField(default=True)
