@@ -1,0 +1,16 @@
+@if(userList$ | async; as resultObject) {
+    <ul>
+      @for(item of resultObject; track item) {
+        <li>
+          <app-user-item  [userInfo] ="item"/>
+        </li>
+      }
+    </ul>
+}
+
+@if(errorMessage) {
+  <app-error-message [errorMessage]="errorMessage" />
+}
+
+
+
