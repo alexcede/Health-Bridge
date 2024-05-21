@@ -7,6 +7,7 @@ from .serializer import DoctorSerializer
 from api.models.assignment.model import Assignment
 from api.models.user.serializer import UserSerializer
 
+from django.http import HttpResponse, Http404
 from rest_framework.decorators import api_view
 from django.core.files.storage import default_storage
 from django.conf import settings
@@ -14,6 +15,15 @@ import os
 import bcrypt
 from django.core.exceptions import ValidationError
 
+
+@csrf_exempt
+def get_doctor_profile_picture(request, filename):
+    file_path = os.path.join(settings.MEDIA_ROOT, 'doctors', filename)
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as f:
+            return HttpResponse(f.read(), content_type="image/jpeg")
+    else:
+        raise Http404
 #Coje a todos los doctores de la base de datos
 @csrf_exempt
 def get_all_doctors(request):
@@ -90,10 +100,10 @@ def add_doctor(request):
                 for chunk in file.chunks():
                     destination.write(chunk)
             # Actualizar el campo 'photo' del doctor con la ruta de la foto guardada
-            file_path_photo = '/backend/core_API/media/doctors/' + new_file_name
+            file_path_photo = new_file_name
             doctor_data['photo'] = file_path_photo
         else:
-            file_path_photo = '/backend/core_API/media/default.jpg'
+            file_path_photo = 'default.jpg'
             doctor_data['photo'] = file_path_photo
         
         # Serializar y guardar los datos del doctor

@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from django.http.response import JsonResponse
+from django.http import HttpResponse, Http404
 from .model import User
 from .serializer import UserSerializer
 
@@ -9,9 +10,84 @@ from django.core.files.storage import default_storage
 from django.conf import settings
 import os
 import bcrypt
+import json
+from django.contrib.auth.hashers import check_password
 from rest_framework.decorators import api_view
 
 from django.core.exceptions import ValidationError
+
+@csrf_exempt
+def get_user_profile_picture(request, filename):
+    file_path = os.path.join(settings.MEDIA_ROOT, 'users', filename)
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as f:
+            return HttpResponse(f.read(), content_type="image/jpeg")
+    else:
+        raise Http404
+
+@csrf_exempt
+def user_login(request):
+    if request.method == 'POST':
+        # Verificar si el cuerpo de la solicitud está vacío
+        if not request.body:
+            return JsonResponse({"error": "Empty request body"}, status=400)
+
+        # Leer el cuerpo de la solicitud como JSON
+        body_unicode = request.body.decode('utf-8')
+        try:
+            user_data = json.loads(body_unicode)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON in request body"}, status=400)
+
+        email = user_data.get('email', '')
+        password = user_data.get('password', '')
+
+        # Buscar el usuario por su correo electrónico
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return JsonResponse({"error": "Incorrect email or password"}, safe=False)
+
+        # Verificar la contraseña
+        if not check_password(password, user.password):
+            return JsonResponse({"error": "Incorrect email or password"}, safe=False)
+
+        # Autenticación exitosa
+        user_data = {
+                "id": user.id,
+                "email": user.email,
+                "photo": user.photo,
+                "name": user.name,
+                "firstSurname": user.firstSurname,
+                "secondSurname": user.secondSurname,
+                "phoneNumber": user.phoneNumber,
+                "healthCardCode": user.healthCardCode,
+                "birthDate": user.birthDate.isoformat(),
+                "gender": user.gender,
+                "dni": user.dni,
+                "address": user.address,
+                "postalCode": user.postalCode,
+                "active": user.active,
+            }
+        return JsonResponse({"success": "Login successful", 
+                             "token": createToken(user),
+                             "role": "user",
+                             "user": user_data
+                             },
+                             status=200, safe=False)
+
+    # Método no permitido
+    return JsonResponse({"error": "Method not allowed. POST method required."}, status=405, safe=False)
+
+def createToken(User):
+    import jwt
+    payload = {
+        'user_id':User.id,
+        'role': 'user'
+    }
+    token = jwt.encode(payload, 'secret_key', algorithm='HS256') 
+    return token
+
 # Coje a todos los usuarios de la base de datos
 @csrf_exempt
 def get_all_users(request):
@@ -89,10 +165,10 @@ def add_user(request):
                 for chunk in file.chunks():
                     destination.write(chunk)
             # Actualizar el campo 'photo' del user con la ruta de la foto guardada
-            file_path_photo = '/backend/core_API/media/users/' + new_file_name
+            file_path_photo = new_file_name
             user_data['photo'] = file_path_photo
         else:
-            file_path_photo = '/backend/core_API/media/default.jpg'
+            file_path_photo = 'default.jpg'
             user_data['photo'] = file_path_photo
         
         # Serializar y guardar los datos del user

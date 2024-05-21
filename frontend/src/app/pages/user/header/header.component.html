@@ -13,13 +13,16 @@
               </div>
               <div class="deskstop_menu" [class.mobile_menu]="menuValue">
                   <ul>
-                      <li (click)="closeMenu()">Home</li>
-                      <li (click)="closeMenu()">Login</li>
-                      <li (click)="closeMenu()">About us</li>
-                      <li (click)="closeMenu()">Contact us</li>
+                      <li (click)="closeMenu()"><a routerLink="/">Home</a></li>
+                      <li *ngIf="!loggedIn" (click)="closeMenu()"><a routerLink="/user/login">Login</a></li>
+                      <li (click)="closeMenu()"><a routerLink="/">About us</a></li>
+                      <li (click)="closeMenu()"><a routerLink="/">Contact us</a></li>
+                      <li *ngIf="loggedIn" (click)="closeMenu()"><a routerLink="/user/{{ userId }}">Profile</a></li>
+                      <li *ngIf="loggedIn" (click)="logout()">Logout</li>
                   </ul>
               </div>
           </div>
       </div>
   </div>
 </header>
+<router-outlet />

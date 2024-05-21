@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import { userGuard } from './core/guards/userGuard/user-guard.guard';
+import { LoginComponent } from './pages/user/login/login.component';
 
 export const routes: Routes = [
   {
@@ -8,6 +10,15 @@ export const routes: Routes = [
   {
     path:'admin',
     loadChildren: () => import('./pages/admin/admin.routes').then(m => m.ADMIN_ROUTES)
+  },
+  {
+    path: 'user',
+    canMatch: [userGuard],
+    loadChildren: () => import('./pages/user/user.routes').then(m => m.USER_ROUTES)
+  },
+  {
+    path: 'user/login',
+    component: LoginComponent,
   },
   {
     path: '**',

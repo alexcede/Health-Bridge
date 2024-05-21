@@ -1,1 +1,27 @@
-<p>user-profile works!</p>
+<app-header />
+<h1 id="title">Profile</h1>
+<div *ngIf="user" class="main-div">
+  <mat-card class="card">
+    <mat-card-header>
+      <div mat-card-avatar>
+        <img src="http://127.0.0.1:8000/api/user/photo/{{user.photo}}/" alt="User photo" class="header-image">
+      </div>
+      <mat-card-title>{{ user.name }} {{ user.firstSurname }} {{user.secondSurname}}</mat-card-title>
+      <mat-card-subtitle class="subtitle">{{ user.email }}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <p>Phone number: {{ user.phoneNumber }}</p>
+      <p>Healthcard code: {{ user.healthCardCode }}</p>
+      <p>Birthdate: {{ user.birthDate | date:'dd-MM-yyyy' }}</p>
+      <p>Gender: {{ user.gender === 'F' ? 'Female' : 'Male' }}</p>
+      <p>Dni: {{ user.dni }}</p>
+      <p>Address: {{ user.address }}</p>
+      <p>Postal code: {{ user.postalCode }}</p>
+    </mat-card-content>
+
+
+
+
+  </mat-card>
+</div>
+<router-outlet />

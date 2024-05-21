@@ -7,8 +7,8 @@ export interface User {
   firstSurname: string;
   secondSurname: string;
   phoneNumber: number;
-  healthBarCode: number;
-  birthdate: Date;
+  healthCardCode: number;
+  birthDate: Date;
   gender: string;
   dni: string;
   address: string;

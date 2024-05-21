@@ -16,4 +16,7 @@ urlpatterns = [
     path('assignment/no-active/<int:user_id>/', views.get_no_active_user_assignments),
     # Endpoints para los reportes del usuario
     path('report/get/<int:user_id>/', views.get_user_reports),
+    
+    path('login/', views.user_login),
+    path('photo/<str:filename>/', views.get_user_profile_picture)
 ]
