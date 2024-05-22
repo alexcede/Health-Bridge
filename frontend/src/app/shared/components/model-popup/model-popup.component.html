@@ -1,0 +1,17 @@
+<!-- popup.component.html -->
+<div *ngIf="isOpen" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+  <div class="bg-white w-1/2 p-6 rounded-lg">
+    <div class="flex justify-between items-center border-b border-gray-200 pb-4 mb-4">
+      <h2 class="text-lg font-semibold">{{ title }}</h2>
+      <button class="text-gray-500 hover:text-gray-700" (click)="closePopup()">
+        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M5.293 5.293a1 1 0 011.414 0L10 8.586l3.293-3.293a1 1 0 111.414 1.414L11.414 10l3.293 3.293a1 1 0 01-1.414 1.414L10 11.414l-3.293 3.293a1 1 0 01-1.414-1.414L8.586 10 5.293 6.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
+      </button>
+    </div>
+    <div class="text-gray-700">
+      <p>{{ message }}</p>
+      <button class="px-4 py-2 bg-red-500 text-white rounded-lg mt-4" (click)="closePopup()">{{ buttonText }}</button>
+    </div>
+  </div>
+</div>

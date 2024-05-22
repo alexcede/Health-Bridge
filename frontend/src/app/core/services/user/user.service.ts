@@ -23,4 +23,10 @@ export class UserService {
       map((user: User) => user)
     )
   }
+  activateUser(id: number): Observable<any> {
+    return this.http.get(this.userApiUrl + `activate/${id}/`)
+  }
+  deleteUser(id: number): Observable<any> {
+    return this.http.delete(this.userApiUrl + `delete/${id}/`);
+  }
 }

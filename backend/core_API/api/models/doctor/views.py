@@ -13,8 +13,69 @@ from django.core.files.storage import default_storage
 from django.conf import settings
 import os
 import bcrypt
+import json
 from django.core.exceptions import ValidationError
+from django.contrib.auth.hashers import check_password
 
+
+
+@csrf_exempt
+def doctor_login(request):
+    if request.method == 'POST':
+        # Verificar si el cuerpo de la solicitud está vacío
+        if not request.body:
+            return JsonResponse({"error": "Empty request body"}, status=400)
+
+        # Leer el cuerpo de la solicitud como JSON
+        body_unicode = request.body.decode('utf-8')
+        try:
+            doctor_data = json.loads(body_unicode)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON in request body"}, status=400)
+
+        email = doctor_data.get('email', '')
+        password = doctor_data.get('password', '')
+
+        # Buscar el usuario por su correo electrónico
+        try:
+            doctor = Doctor.objects.get(email=email)
+        except Doctor.DoesNotExist:
+            return JsonResponse({"error": "Incorrect email or password"}, safe=False)
+
+        # Verificar la contraseña
+        if not check_password(password, doctor.password):
+            return JsonResponse({"error": "Incorrect email or password"}, safe=False)
+
+        # Autenticación exitosa
+        doctor_data = {
+                "id": doctor.id,
+                "email": doctor.email,
+                "dni": doctor.dni,
+                "photo": doctor.photo,
+                "name": doctor.name,
+                "firstSurname": doctor.firstSurname,
+                "secondSurname": doctor.secondSurname,
+                "phoneNumber": doctor.phoneNumber,
+                "active": doctor.active,
+            }
+        return JsonResponse({"success": "Login successful", 
+                             "token": createToken(doctor),
+                             "role": "doctor",
+                             "user": doctor_data
+                             },
+                             status=200, safe=False)
+
+    # Método no permitido
+    return JsonResponse({"error": "Method not allowed. POST method required."}, status=405, safe=False)
+
+def createToken(Doctor):
+    import jwt
+    payload = {
+        'doctor_id':Doctor.id,
+        'role': 'doctor'
+    }
+    token = jwt.encode(payload, 'secret_key', algorithm='HS256') 
+    return token
 
 @csrf_exempt
 def get_doctor_profile_picture(request, filename):
@@ -194,9 +255,10 @@ def get_doctor_assignments(request, doctor_id):
                 # Crear un diccionario con la información de cada asignación
                 assignment_data = {
                     'id': assignment.id,
-                    'doctor': doctor_serializer.data,
-                    'user': user_serializer.data,
-                    'dateCreated': assignment.dateCreated
+                    'doctor': doctor_id,
+                    'user': user_serializer.data['id'],
+                    'dateCreated': assignment.dateCreated,
+                    'active': assignment.active,
                 }
                 assignments_data.append(assignment_data)
             return JsonResponse(assignments_data, safe=False)

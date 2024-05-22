@@ -14,6 +14,6 @@ export const appConfig: ApplicationConfig = {
       withInterceptors([errorHandlerInterceptor]),
       withFetch()
     ),
-    provideClientHydration(), provideAnimationsAsync()
+    provideClientHydration(), provideAnimationsAsync(), provideAnimationsAsync()
   ]
 };

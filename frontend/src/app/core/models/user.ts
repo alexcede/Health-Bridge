@@ -15,3 +15,21 @@ export interface User {
   postalCode: number;
   active: boolean;
 }
+
+export class userResponse {
+  id = 0
+  email = ''
+  password = ''
+  photo = ''
+  name = ''
+  firstSurname = ''
+  secondSurname = ''
+  phoneNumber = 0
+  healthCardCode = 0
+  birthDate = Date
+  gender = ''
+  dni = ''
+  address = ''
+  postalCode = 0
+  active = Boolean
+}

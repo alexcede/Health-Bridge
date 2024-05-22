@@ -1,0 +1,43 @@
+@import 'primeflex/primeflex.css';
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 70vh;
+}
+.w-full {
+  border-radius: 10px;
+}
+.surface-card {
+  padding: 4rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin: 0;
+  border-radius: 10px;
+}
+.custom-button {
+  text-align: center;
+  line-height: 1.2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+.custom-button {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  line-height: 1.2;
+}
+
+.custom-button .p-button-label {
+  flex: 1;
+  text-align: center;
+}
+
+.custom-button .pi {
+  margin-right: 0.5rem; 
+}
+
+

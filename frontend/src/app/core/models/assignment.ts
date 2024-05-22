@@ -1,37 +1,36 @@
-export interface DoctorAssignment {
+export interface DoctorAssignmentResult {
   id: number;
-  email: string;
-  password: string;
-  dni: string;
-  photo: string;
-  name: string;
-  firstSurname: string;
-  secondSurname: string;
-  phoneNumber: string;
-  active: boolean;
-}
-
-export interface UserAssignment {
-  id: number;
-  email: string;
-  password: string;
-  photo: string;
-  name: string;
-  firstSurname: string;
-  secondSurname: string;
-  phoneNumber: string;
-  healthCardCode: string;
-  birthDate: string;
-  gender: string;
-  dni: string;
-  address: string;
-  postalCode: string;
-  active: boolean;
-}
-
-export interface AssignmentResult {
-  id: number;
-  doctor: DoctorAssignment | number;
-  user: UserAssignment | number;
+  doctor: number;
+  user: number;
   dateCreated: string;
+  active: boolean;
 }
+export interface DoctorTableAssignmentResult {
+  id: number;
+  doctor: string;
+  doctor_name: string;
+  user: string;
+  user_name: string;
+  dateCreated: string;
+  active: boolean;
+}
+
+export class DoctorTableAssignmentResponse {
+  id = 0;
+  doctor = '';
+  doctor_name = '';
+  user = '';
+  user_name = '';
+  dateCreated = '';
+  active = true;
+}
+
+export class DoctorAssignmentResponse {
+  id = 0;
+  doctor = 0;
+  user = 0;
+  dateCreated = '';
+  active = Boolean;
+}
+
+

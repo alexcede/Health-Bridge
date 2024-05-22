@@ -1,0 +1,61 @@
+<main class="p-10">
+  <div class="flex items-center justify-between pb-6">
+    <h1>List of {{ title }}</h1>
+  </div>
+  <div class="flex flex-col space-y-4 pb-6">
+    <!-- Input para filtrar por nombre, apellidos, número de teléfono y DNI -->
+    <div class="flex space-x-4">
+      <input *ngIf="columns.includes('name')" type="text" [(ngModel)]="filters.name" placeholder="Name..." class="px-3 py-2 border rounded-md text-sm">
+      <input *ngIf="columns.includes('firstSurname')" type="text" [(ngModel)]="filters.firstSurname" placeholder="First surname..." class="px-3 py-2 border rounded-md text-sm">
+      <input *ngIf="columns.includes('secondSurname')" type="text" [(ngModel)]="filters.secondSurname" placeholder="Second surname..." class="px-3 py-2 border rounded-md text-sm">
+      <input *ngIf="columns.includes('phoneNumber')" type="text" [(ngModel)]="filters.phoneNumber" placeholder="Phone number..." class="px-3 py-2 border rounded-md text-sm">
+      <input *ngIf="columns.includes('dni')" type="text" [(ngModel)]="filters.dni" placeholder="DNI..." class="px-3 py-2 border rounded-md text-sm">
+    </div>
+    <!-- Radio buttons para filtrar por estado activo o inactivo -->
+    <div class="flex space-x-4">
+      <label><input *ngIf="columns.includes('active')" type="radio" name="status" [(ngModel)]="filters.active" (change)="toggleActiveFilter()" [value]="null" checked>Show all</label>
+      <label><input *ngIf="columns.includes('active')" type="radio" name="status" [(ngModel)]="filters.active" (change)="toggleActiveFilter()" [value]="true"> Show active</label>
+      <label><input *ngIf="columns.includes('active')" type="radio" name="status" [(ngModel)]="filters.active" (change)="toggleActiveFilter()" [value]="false"> Show inactive</label>
+    </div>
+  </div>
+  <div class="relative overflow-x-auto shadow-md sm:rounded-lg mx-auto max-w-7xl">
+    <table *ngIf="isDataUpdated" class="min-w-full text-xs text-left rtl:text-right text-gray-500 dark:text-gray-400">
+      <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <tr>
+          <!-- Mostrar columnas -->
+          <ng-container *ngFor="let column of columns; trackBy: trackByIndex">
+            <th *ngIf="column !== 'id' && column !== 'password' && column !== 'healthCardCode' && column !== 'address' && column !== 'postalCode'" scope="col" class="px-2 py-1">
+              {{ column }}
+            </th>
+          </ng-container>
+          <!-- Columna de acciones -->
+          <th scope="col" class="px-2 py-1">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let row of filteredData(); trackBy: trackByIndex">
+          <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+            <ng-container *ngFor="let column of columns; trackBy: trackByIndex">
+              <!-- Mostrar datos de la fila -->
+              <td *ngIf="column !== 'id' && column !== 'password' && column !== 'healthCardCode' && column !== 'address' && column !== 'postalCode' && column !== 'active'" class="px-2 py-1">
+                {{ row[column] }}
+              </td>
+            </ng-container>
+            <!-- Bola de estado activo/inactivo -->
+            <td *ngIf="row.active !== 'undefined'" class="px-2 py-1 text-center">
+              <div class="w-4 h-4 rounded-full mx-auto"
+                   [ngClass]="{'bg-green-500': row.active, 'bg-red-500': !row.active}">
+              </div>
+            </td>
+            <!-- Columna de acciones -->
+            <td class="py-1 text-left">
+              <a class="font-medium text-blue-600 dark:text-blue-500 hover:underline pr-4" (click)="onAction('Edit', row)">Edit</a>
+              <a *ngIf="row['active'] === true" class="font-medium text-blue-600 dark:text-blue-500 hover:underline" (click)="onAction('Delete', row)">Delete</a>
+              <a *ngIf="row['active'] === false" class="font-medium text-blue-600 dark:text-blue-500 hover:underline" (click)="onAction('Activate', row)">Activate</a>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+</main>

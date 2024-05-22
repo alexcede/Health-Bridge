@@ -10,6 +10,7 @@ urlpatterns = [
     path('add/', views.add_user),
     path('update/<int:id>/', views.update_user),
     path('delete/<int:id>/', views.delete_user),
+    path('activate/<int:id>/', views.active_user),
     # Endpoints para las asignaciones del usuario
     path('assignment/<int:user_id>/', views.get_user_assignments),
     path('assignment/active/<int:user_id>/', views.get_active_user_assignment),

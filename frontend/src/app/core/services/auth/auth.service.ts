@@ -19,13 +19,24 @@ export class AuthService {
     }
     return of(false);
   }
-  getUserIdFromLocalStorage(): string | undefined {
+
+  getDoctorAuthToken(): Observable<boolean> {
+    if (typeof localStorage !== 'undefined') {
+      const token = localStorage.getItem('doctor_token');
+      const role = localStorage.getItem('role');
+      if (token && role === 'doctor') {
+        return of(true);
+      }
+    }
+    return of(false);
+  }
+  getUserIdFromLocalStorage(): number {
     const userJson = localStorage.getItem('loggedUser');
     if (userJson) {
       const user: User = JSON.parse(userJson);
-      return user.id.toString();
+      return user.id;
     }
-    return undefined;
+    return 0;
   }
 
   isLoggedIn(): boolean {

@@ -1,0 +1,93 @@
+header {
+  padding: 10px;
+  background: white;
+  position: relative;
+  z-index: 10;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  width: 90px;
+}
+
+.logo:hover {
+  cursor: pointer;
+}
+
+.company-name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-left: 10px;
+}
+
+.deskstop_menu {
+  margin-top: 24px;
+}
+
+.deskstop_menu ul {
+  padding: 0;
+  margin: 0;
+}
+
+.deskstop_menu ul li {
+  list-style-type: none;
+  color: black;
+  display: inline-block;
+  font-size: 18px;
+  margin-bottom: 15px;
+  padding: 12px;
+  transition: font-size 0.5s ease-in-out, color 0.5s ease-in-out, font-weight 0.5s ease-in-out;
+}
+
+.deskstop_menu ul li a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.deskstop_menu ul li:hover {
+  font-size: 19px;
+  font-weight: bold;
+  color: #3fbceb;
+  cursor: pointer;
+}
+
+.menu-icon {
+  display: none;
+}
+
+@media screen and (min-width: 128px) and (max-width: 900px) {
+  .deskstop_menu {
+    position: fixed;
+    transition: right 0.4s ease-in-out;
+    right: -280px;
+    top: 64px;
+    background: white;
+    width: 280px;
+    height: 100%;
+    z-index: 1000;
+  }
+
+  .deskstop_menu ul li {
+    display: block;
+    text-align: left;
+    margin: 0;
+    padding: 10px 0 10px 26px;
+    border-bottom: 1px solid grey;
+  }
+
+  .menu-icon {
+    display: block;
+    color: black;
+    font-size: 40px;
+    padding: 10px;
+  }
+
+  .mobile_menu {
+    right: 0;
+    transition: right 0.4s ease-in-out;
+  }
+}

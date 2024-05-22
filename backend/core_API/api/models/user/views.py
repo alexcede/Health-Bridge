@@ -247,6 +247,17 @@ def delete_user(request, id):
         except User.DoesNotExist:
             return JsonResponse("Usuario no encontrado.", status=404, safe=False)
         
+@csrf_exempt
+def active_user(request, id):
+    if request.method == 'GET':
+        try:
+            user = User.objects.get(id=id)
+            user.active = True
+            user.save()
+            return JsonResponse("Usuario desactivado correctamente.", status=200, safe=False)
+        except User.DoesNotExist:
+            return JsonResponse("Usuario no encontrado.", status=404, safe=False)
+        
 #                             // Asignaciones
 
 #Coje todas las asignaciones del usuario

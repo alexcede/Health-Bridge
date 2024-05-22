@@ -21,6 +21,7 @@ urlpatterns = [
     
     # Endpoints para los reportes del doctor
     path('report/get/<int:doctor_id>/', views.get_doctor_reports),
+    path('login/', views.doctor_login),
     
     
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
