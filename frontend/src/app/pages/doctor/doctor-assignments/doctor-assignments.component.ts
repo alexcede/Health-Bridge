@@ -10,7 +10,8 @@ import { User } from '../../../core/models/user';
 import { DoctorTableAssignmentResponse } from '../../../core/models/assignment';
 import { forkJoin, Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { Action } from '../../../core/models/table-column';
+import { Action, getEntityProperties } from '../../../core/models/table-column';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-doctor-assignments',
@@ -23,16 +24,17 @@ export class DoctorAssignmentsComponent implements OnInit {
   constructor(
     private doctorService: DoctorService,
     private userService: UserService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) { }
 
   public doctorAssignmentList: DoctorTableAssignmentResponse[] = [];
   public columns: string[] = [];
-  title: string = 'Doctors';
+  title: string = 'doctor assignments';
   doctor_id: number = this.authService.getUserIdFromLocalStorage();
 
   ngOnInit(): void {
-    this.columns = ['id', 'doctor_name', 'user_name', 'dateCreated', 'active']; // Define columnas según necesidad
+    this.columns = ['id', 'doctor_name', 'user_name', 'dni', 'phoneNumber', 'dateCreated', 'active'];
     this.loadDoctorAssignments();
   }
 
@@ -51,6 +53,8 @@ export class DoctorAssignmentsComponent implements OnInit {
               doctor: assignment.doctor.toString(),
               doctor_name: `${doctor.name} ${doctor.firstSurname} ${doctor.secondSurname}`,
               user: assignment.user.toString(),
+              dni: user.dni,
+              phoneNumber: user.phoneNumber,
               user_name: `${user.name} ${user.firstSurname} ${user.secondSurname}`,
               dateCreated: new Date(assignment.dateCreated).toLocaleDateString('es-ES'),
               active: assignment.active
@@ -87,7 +91,10 @@ export class DoctorAssignmentsComponent implements OnInit {
     } else if (tableAction.action === 'Delete') {
       console.log('delete' + tableAction.row.id);
     } else if (tableAction.action === 'Activate') {
-      console.log('activate');
+      console.log('activate' + tableAction.row.id);
+    } else if (tableAction.action === 'Info') {
+      const userId = tableAction.row.user;
+      this.router.navigate(['/doctor/user-profile', userId]);
     }
   }
 }

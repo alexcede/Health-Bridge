@@ -25,7 +25,7 @@ export class UserListComponent implements OnInit {
   title:string = 'users';
 
   ngOnInit(): void {
-
+    
     this.columns = getEntityProperties('user')
 
     this.loadUsers()

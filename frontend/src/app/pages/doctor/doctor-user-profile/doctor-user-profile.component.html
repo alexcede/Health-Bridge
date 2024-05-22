@@ -1,12 +1,12 @@
-<app-header />
-<h1 id="title">Profile</h1>
+<app-doctor-header />
+<h1 id="title">User profile</h1>
 <div *ngIf="user" class="main-div">
   <mat-card class="card">
     <mat-card-header>
       <div mat-card-avatar>
-        <img src="http://127.0.0.1:8000/api/user/photo/{{user.photo}}/" alt="User photo" class="header-image">
+        <img [src]="'http://127.0.0.1:8000/api/user/photo/' + user.photo" alt="User photo" class="header-image">
       </div>
-      <mat-card-title>{{ user.name }} {{ user.firstSurname }} {{user.secondSurname}}</mat-card-title>
+      <mat-card-title>{{ user.name }} {{ user.firstSurname }} {{ user.secondSurname }}</mat-card-title>
       <mat-card-subtitle class="subtitle">{{ user.email }}</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
@@ -20,4 +20,3 @@
     </mat-card-content>
   </mat-card>
 </div>
-<router-outlet />

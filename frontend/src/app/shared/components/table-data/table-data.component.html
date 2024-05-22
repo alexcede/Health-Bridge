@@ -37,21 +37,25 @@
           <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
             <ng-container *ngFor="let column of columns; trackBy: trackByIndex">
               <!-- Mostrar datos de la fila -->
-              <td *ngIf="column !== 'id' && column !== 'password' && column !== 'healthCardCode' && column !== 'address' && column !== 'postalCode' && column !== 'active'" class="px-2 py-1">
+              <td *ngIf="column !== 'photo' && column !== 'id' && column !== 'password' && column !== 'healthCardCode' && column !== 'address' && column !== 'postalCode' && column !== 'active'" class="px-2 py-1">
                 {{ row[column] }}
+              </td>
+              <td *ngIf="column === 'photo'" class="px-2 py-1">
+                <img  class="w-10 h-10 rounded-full" [src]="getUserPhotoUrl(row) || getDoctorPhotoUrl(row) || row['column']"  alt="Jese image">
               </td>
             </ng-container>
             <!-- Bola de estado activo/inactivo -->
-            <td *ngIf="row.active !== 'undefined'" class="px-2 py-1 text-center">
-              <div class="w-4 h-4 rounded-full mx-auto"
+            <td *ngIf="row.active !== 'undefined'" class="px-2 py-3 text-center">
+              <div class="w-6 h-6 rounded-full mx-auto"
                    [ngClass]="{'bg-green-500': row.active, 'bg-red-500': !row.active}">
               </div>
             </td>
             <!-- Columna de acciones -->
-            <td class="py-1 text-left">
-              <a class="font-medium text-blue-600 dark:text-blue-500 hover:underline pr-4" (click)="onAction('Edit', row)">Edit</a>
-              <a *ngIf="row['active'] === true" class="font-medium text-blue-600 dark:text-blue-500 hover:underline" (click)="onAction('Delete', row)">Delete</a>
-              <a *ngIf="row['active'] === false" class="font-medium text-blue-600 dark:text-blue-500 hover:underline" (click)="onAction('Activate', row)">Activate</a>
+            <td class="py-3 text-left">
+              <button *ngIf="(loggedUserRole === 'admin' || (loggedUserRole === 'doctor'))  " class="font-medium text-blue-600 dark:text-blue-500 hover:underline pr-4" (click)="onAction('Edit', row)">Edit</button>
+              <button *ngIf="row['active'] === true && (loggedUserRole === 'admin' || loggedUserRole === 'doctor')" class="font-medium text-blue-600 dark:text-blue-500 hover:underline pr-4" (click)="onAction('Delete', row)">Delete</button>
+              <button *ngIf="row['active'] === false && (loggedUserRole === 'admin' || loggedUserRole === 'doctor')" class="font-medium text-blue-600 dark:text-blue-500 hover:underline pr-4" (click)="onAction('Activate', row)">Activate</button>
+              <button *ngIf="loggedUserRole === 'admin' || loggedUserRole === 'doctor'" class="font-medium text-blue-600 dark:text-blue-500 hover:underline" (click)="onAction('Info', row)">Info</button>
             </td>
           </tr>
         </ng-container>

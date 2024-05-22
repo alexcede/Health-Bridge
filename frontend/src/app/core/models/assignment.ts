@@ -11,6 +11,8 @@ export interface DoctorTableAssignmentResult {
   doctor_name: string;
   user: string;
   user_name: string;
+  dni: string;
+  phoneNumber: number;
   dateCreated: string;
   active: boolean;
 }
@@ -21,6 +23,8 @@ export class DoctorTableAssignmentResponse {
   doctor_name = '';
   user = '';
   user_name = '';
+  dni = '';
+  phoneNumber = 0;
   dateCreated = '';
   active = true;
 }

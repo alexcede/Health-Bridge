@@ -3,6 +3,8 @@ import { Action } from '../../../core/models/table-column';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ModelPopupComponent } from '../model-popup/model-popup.component';
+import { AuthService } from '../../../core/services/auth/auth.service';
+
 @Component({
   selector: 'app-table-data',
   standalone: true,
@@ -12,8 +14,11 @@ import { ModelPopupComponent } from '../model-popup/model-popup.component';
 })
 export class TableDataComponent {
 
-  constructor() {}
+  constructor(authService: AuthService) {
+    this.loggedUserRole = authService.getUserRoleFromLocalStorage();
+  }
 
+  loggedUserRole: string | null = '';
   title = '';
   columns: string[] = [];
   originalDataSource: any = []; // Copia separada de los datos originales
@@ -27,6 +32,7 @@ export class TableDataComponent {
     firstSurname: string,
     secondSurname: string,
     phoneNumber: string;
+    userName: string;
     dni: string;
     active: boolean | null;
     email: string;
@@ -35,6 +41,7 @@ export class TableDataComponent {
     firstSurname: '',
     secondSurname: '',
     phoneNumber: '',
+    userName: '',
     dni: '',
     active: null,
     email: ''
@@ -79,11 +86,11 @@ export class TableDataComponent {
 
   filteredData() {
     let filtered = this.dataSource.filter((item: any) => {
-      const matchesName = !this.filters.name || (item.hasOwnProperty('name') && item.name.toLowerCase().includes(this.filters.name.toLowerCase()));
-      const matchesFirstSurname = !this.filters.firstSurname || (item.hasOwnProperty('firstSurname') && item.firstSurname.toLowerCase().includes(this.filters.firstSurname.toLowerCase()));
-      const matchesSecondSurname = !this.filters.secondSurname || (item.hasOwnProperty('secondSurname') && item.secondSurname.toLowerCase().includes(this.filters.secondSurname.toLowerCase()));
-      const matchesPhone = !this.filters.phoneNumber || (item.hasOwnProperty('phoneNumber') && item.phoneNumber.toString().includes(this.filters.phoneNumber));
-      const matchesDni = !this.filters.dni || (item.hasOwnProperty('dni') && item.dni.toLowerCase().includes(this.filters.dni.toLowerCase()));
+      const matchesName = !this.filters.name || (item.hasOwnProperty('name') && item.name && item.name.toLowerCase().includes(this.filters.name.toLowerCase()));
+      const matchesFirstSurname = !this.filters.firstSurname || (item.hasOwnProperty('firstSurname') && item.firstSurname && item.firstSurname.toLowerCase().includes(this.filters.firstSurname.toLowerCase()));
+      const matchesSecondSurname = !this.filters.secondSurname || (item.hasOwnProperty('secondSurname') && item.secondSurname && item.secondSurname.toLowerCase().includes(this.filters.secondSurname.toLowerCase()));
+      const matchesPhone = !this.filters.phoneNumber || (item.hasOwnProperty('phoneNumber') && item.phoneNumber && item.phoneNumber.toString().includes(this.filters.phoneNumber));
+      const matchesDni = !this.filters.dni || (item.hasOwnProperty('dni') && item.dni && item.dni.toLowerCase().includes(this.filters.dni.toLowerCase()));
       return matchesName && matchesPhone && matchesDni && matchesFirstSurname && matchesSecondSurname;
     });
 
@@ -93,4 +100,13 @@ export class TableDataComponent {
 
     return filtered;
   }
+
+  getUserPhotoUrl(row: any): string | null {
+    return 'http://127.0.0.1:8000/api/user/photo/' + row['photo'];
+  }
+
+  getDoctorPhotoUrl(row: any): string {
+    return 'http://127.0.0.1:8000/api/doctor/photo/' + row['photo'];
+  }
+
 }

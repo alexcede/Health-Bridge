@@ -1,4 +1,4 @@
-import { DoctorAssignmentResponse } from "./assignment";
+import { DoctorAssignmentResponse, DoctorTableAssignmentResponse } from "./assignment";
 import { userResponse } from "./user";
 
 export interface Action<T = any> {
@@ -15,7 +15,7 @@ export const getEntityProperties = (entity: string): Array<any> => {
     case 'user':
       resultClass = new userResponse(); break;
     case 'doctorAssignment':
-      resultClass = new DoctorAssignmentResponse; break;
+      resultClass = new DoctorTableAssignmentResponse; break;
   }
 
   if(resultClass){
