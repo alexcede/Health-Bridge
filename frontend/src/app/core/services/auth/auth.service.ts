@@ -20,6 +20,17 @@ export class AuthService {
     return of(false);
   }
 
+
+  getAdminAuthToken(): Observable<boolean> {
+    if (typeof localStorage !== 'undefined') {
+      const token = localStorage.getItem('admin_token');
+      const role = localStorage.getItem('role');
+      if (token && role === 'admin') {
+        return of(true);
+      }
+    }
+    return of(false);
+  }
   getDoctorAuthToken(): Observable<boolean> {
     if (typeof localStorage !== 'undefined') {
       const token = localStorage.getItem('doctor_token');

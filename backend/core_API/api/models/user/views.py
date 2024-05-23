@@ -5,7 +5,10 @@ from django.http.response import JsonResponse
 from django.http import HttpResponse, Http404
 from .model import User
 from .serializer import UserSerializer
-
+from api.models.medicine.model import Medicine
+from api.models.recipe.model import Recipe
+from api.models.recipeInfo.model import RecipeInfo
+from api.models.report.model import Report
 from django.core.files.storage import default_storage
 from django.conf import settings
 import os
@@ -44,7 +47,7 @@ def user_login(request):
 
         # Buscar el usuario por su correo electrónico
         try:
-            user = User.objects.get(email=email)
+            user = User.objects.get(email=email, active=True)
         except User.DoesNotExist:
             return JsonResponse({"error": "Incorrect email or password"}, safe=False)
 
@@ -87,6 +90,50 @@ def createToken(User):
     }
     token = jwt.encode(payload, 'secret_key', algorithm='HS256') 
     return token
+
+@csrf_exempt
+def get_user_recipes(request, id):
+    try:
+        # Filtrar los informes del usuario específico
+        user_reports = Report.objects.filter(user_id=id)
+        
+        user_recipes = []
+        
+        # Para cada informe del usuario, obtener las recetas relacionadas
+        for report in user_reports:
+            report_recipes = Recipe.objects.filter(report_id=report.id)
+            
+            for recipe in report_recipes:
+                # Obtener los detalles de la receta (Medicamentos y dosis)
+                recipe_infos = RecipeInfo.objects.filter(recipe_id=recipe.id)
+                
+                medicines = []
+                for recipe_info in recipe_infos:
+                    medicine = Medicine.objects.get(id=recipe_info.medicine_id)
+                    medicines.append({
+                        'medicine_id': medicine.id,
+                        'medicine_name': medicine.name,
+                        'morning_dose': recipe_info.morning_dose,
+                        'noon_dose': recipe_info.noon_dose,
+                        'night_dose': recipe_info.night_dose,
+                        'total_dose': recipe_info.morning_dose + recipe_info.noon_dose + recipe_info.night_dose
+                    })
+                
+                user_recipes.append({
+                    'report_id': report.id,
+                    'report_name': report.reportName,
+                    'disease': report.disease,
+                    'report_info': report.reportInfo,
+                    'date_created': report.dateCreated,
+                    'recipe_id': recipe.id,
+                    'date_finish': recipe.dateFinish,
+                    'medicines': medicines
+                })
+        
+        return JsonResponse({'user_recipes': user_recipes}, safe=False)
+    
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 # Coje a todos los usuarios de la base de datos
 @csrf_exempt

@@ -4,6 +4,8 @@ import { LoginComponent } from './pages/user/login/login.component';
 import { DoctorLoginComponent } from './pages/doctor/doctor-login/doctor-login.component';
 import { DOCTOR_ROUTES } from './pages/doctor/doctor.routes';
 import { doctorGuard } from './core/guards/doctorGuard/doctor-guard.guard';
+import { AdminLoginComponent } from './pages/admin/admin-login/admin-login.component';
+import { adminGuard } from './core/guards/adminGuard/admin-guard.guard';
 
 export const routes: Routes = [
   {
@@ -12,6 +14,7 @@ export const routes: Routes = [
   },
   {
     path:'admin',
+    canMatch: [adminGuard],
     loadChildren: () => import('./pages/admin/admin.routes').then(m => m.ADMIN_ROUTES)
   },
   {
@@ -31,6 +34,10 @@ export const routes: Routes = [
   {
     path: 'doctor/login',
     component: DoctorLoginComponent
+  },
+  {
+    path: 'admin/login',
+    component: AdminLoginComponent,
   },
   {
     path: '**',

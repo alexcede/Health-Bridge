@@ -66,7 +66,7 @@ def get_assignment(request, id):
 # Cambiar el campo active a True
 @csrf_exempt
 def activate_assignment(request, id):
-    if request.method == 'PUT':
+    if request.method == 'GET':
         try:
             assignment = Assignment.objects.get(id=id)
             assignment.active = True

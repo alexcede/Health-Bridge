@@ -20,4 +20,10 @@
     </mat-card-content>
   </mat-card>
 </div>
+<app-table-data
+  [tableTitle]="title"
+  [tableColumns]="columns"
+  [tableData]="recipes"
+  (tableAction)="onAction($event)">
+</app-table-data>
 <router-outlet />

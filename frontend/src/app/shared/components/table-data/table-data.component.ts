@@ -1,14 +1,13 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Action } from '../../../core/models/table-column';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ModelPopupComponent } from '../model-popup/model-popup.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../../../core/services/auth/auth.service';
 
 @Component({
   selector: 'app-table-data',
   standalone: true,
-  imports: [CommonModule, FormsModule, ModelPopupComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './table-data.component.html',
   styleUrls: ['./table-data.component.css']
 })
@@ -36,6 +35,8 @@ export class TableDataComponent {
     dni: string;
     active: boolean | null;
     email: string;
+    reportName: string;
+    disease: string;
   } = {
     name: '',
     firstSurname: '',
@@ -44,7 +45,9 @@ export class TableDataComponent {
     userName: '',
     dni: '',
     active: null,
-    email: ''
+    email: '',
+    reportName: '',
+    disease: '',
   };
 
   trackByIndex(index: number, item: any): any {
@@ -91,7 +94,9 @@ export class TableDataComponent {
       const matchesSecondSurname = !this.filters.secondSurname || (item.hasOwnProperty('secondSurname') && item.secondSurname && item.secondSurname.toLowerCase().includes(this.filters.secondSurname.toLowerCase()));
       const matchesPhone = !this.filters.phoneNumber || (item.hasOwnProperty('phoneNumber') && item.phoneNumber && item.phoneNumber.toString().includes(this.filters.phoneNumber));
       const matchesDni = !this.filters.dni || (item.hasOwnProperty('dni') && item.dni && item.dni.toLowerCase().includes(this.filters.dni.toLowerCase()));
-      return matchesName && matchesPhone && matchesDni && matchesFirstSurname && matchesSecondSurname;
+      const matchesReportName = !this.filters.reportName || (item.hasOwnProperty('report_name') && item.report_name && item.report_name.toLowerCase().includes(this.filters.reportName.toLowerCase()));
+      const matchesDisease = !this.filters.disease || (item.hasOwnProperty('disease') && item.disease && item.disease.toLowerCase().includes(this.filters.disease.toLowerCase()));
+      return matchesName && matchesPhone && matchesDni && matchesFirstSurname && matchesSecondSurname && matchesReportName && matchesDisease;
     });
 
     if (this.filters.active !== null) {

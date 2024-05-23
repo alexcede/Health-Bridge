@@ -1,4 +1,4 @@
-<main class="p-10">
+<main class="p-10 overflow-y-auto h-400px">
   <div class="flex items-center justify-between pb-6">
     <h1>List of {{ title }}</h1>
   </div>
@@ -10,12 +10,14 @@
       <input *ngIf="columns.includes('secondSurname')" type="text" [(ngModel)]="filters.secondSurname" placeholder="Second surname..." class="px-3 py-2 border rounded-md text-sm">
       <input *ngIf="columns.includes('phoneNumber')" type="text" [(ngModel)]="filters.phoneNumber" placeholder="Phone number..." class="px-3 py-2 border rounded-md text-sm">
       <input *ngIf="columns.includes('dni')" type="text" [(ngModel)]="filters.dni" placeholder="DNI..." class="px-3 py-2 border rounded-md text-sm">
+      <input *ngIf="columns.includes('report_name')" type="text" [(ngModel)]="filters.reportName" placeholder="Report name..." class="px-3 py-2 border rounded-md text-sm">
+      <input *ngIf="columns.includes('disease')" type="text" [(ngModel)]="filters.disease" placeholder="Disease..." class="px-3 py-2 border rounded-md text-sm">
     </div>
     <!-- Radio buttons para filtrar por estado activo o inactivo -->
     <div class="flex space-x-4">
-      <label><input *ngIf="columns.includes('active')" type="radio" name="status" [(ngModel)]="filters.active" (change)="toggleActiveFilter()" [value]="null" checked>Show all</label>
-      <label><input *ngIf="columns.includes('active')" type="radio" name="status" [(ngModel)]="filters.active" (change)="toggleActiveFilter()" [value]="true"> Show active</label>
-      <label><input *ngIf="columns.includes('active')" type="radio" name="status" [(ngModel)]="filters.active" (change)="toggleActiveFilter()" [value]="false"> Show inactive</label>
+      <label *ngIf="columns.includes('active')"><input *ngIf="columns.includes('active')" type="radio" name="status" [(ngModel)]="filters.active" (change)="toggleActiveFilter()" [value]="null" checked>Show all</label>
+      <label *ngIf="columns.includes('active')"><input *ngIf="columns.includes('active')" type="radio" name="status" [(ngModel)]="filters.active" (change)="toggleActiveFilter()" [value]="true"> Show active</label>
+      <label *ngIf="columns.includes('active')"><input *ngIf="columns.includes('active')" type="radio" name="status" [(ngModel)]="filters.active" (change)="toggleActiveFilter()" [value]="false"> Show inactive</label>
     </div>
   </div>
   <div class="relative overflow-x-auto shadow-md sm:rounded-lg mx-auto max-w-7xl">
@@ -29,7 +31,7 @@
             </th>
           </ng-container>
           <!-- Columna de acciones -->
-          <th scope="col" class="px-2 py-1">Acciones</th>
+          <th scope="col" class="px-2 py-1">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -45,17 +47,18 @@
               </td>
             </ng-container>
             <!-- Bola de estado activo/inactivo -->
-            <td *ngIf="row.active !== 'undefined'" class="px-2 py-3 text-center">
+            <td *ngIf="title != 'Recipes' && title != 'your recipes'" class="px-2 py-3 text-center">
               <div class="w-6 h-6 rounded-full mx-auto"
                    [ngClass]="{'bg-green-500': row.active, 'bg-red-500': !row.active}">
               </div>
             </td>
             <!-- Columna de acciones -->
             <td class="py-3 text-left">
-              <button *ngIf="(loggedUserRole === 'admin' || (loggedUserRole === 'doctor'))  " class="font-medium text-blue-600 dark:text-blue-500 hover:underline pr-4" (click)="onAction('Edit', row)">Edit</button>
-              <button *ngIf="row['active'] === true && (loggedUserRole === 'admin' || loggedUserRole === 'doctor')" class="font-medium text-blue-600 dark:text-blue-500 hover:underline pr-4" (click)="onAction('Delete', row)">Delete</button>
+              <button *ngIf="(loggedUserRole === 'admin' || (loggedUserRole === 'doctor' && (title !== 'users' && title !== 'doctor assignments' && title !== 'Recipes')))" class="font-medium text-blue-600 dark:text-blue-500 hover:underline pr-4" (click)="onAction('Edit', row)">Edit</button>
+              <button *ngIf="row['active'] === true && (loggedUserRole === 'admin' || (loggedUserRole === 'doctor' && title !== 'users'))" class="font-medium text-blue-600 dark:text-blue-500 hover:underline pr-4" (click)="onAction('Delete', row)">Delete</button>
               <button *ngIf="row['active'] === false && (loggedUserRole === 'admin' || loggedUserRole === 'doctor')" class="font-medium text-blue-600 dark:text-blue-500 hover:underline pr-4" (click)="onAction('Activate', row)">Activate</button>
-              <button *ngIf="loggedUserRole === 'admin' || loggedUserRole === 'doctor'" class="font-medium text-blue-600 dark:text-blue-500 hover:underline" (click)="onAction('Info', row)">Info</button>
+              <button *ngIf="loggedUserRole === 'admin' || loggedUserRole === 'user' || (loggedUserRole === 'doctor' && title !== 'users')" class="font-medium text-blue-600 dark:text-blue-500 hover:underline" (click)="onAction('Info', row)">Info</button>
+              <button *ngIf="loggedUserRole === 'doctor' && title === 'users'" class="font-medium text-blue-600 dark:text-blue-500 hover:underline" (click)="onAction('Info', row)">Assignment</button>
             </td>
           </tr>
         </ng-container>

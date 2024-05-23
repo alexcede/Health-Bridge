@@ -1,0 +1,30 @@
+<div class="report-container mx-auto p-8 max-w-lg overflow-y-auto">
+  <h1 class="text-3xl font-bold mb-4">{{ report.report_name }}</h1>
+  <p class="text-lg mb-2">Nombre de la Enfermedad: <span class="font-semibold">{{ report.disease }}</span></p>
+  <p class="text-base mb-4">Información del Reporte: <span class="italic">{{ report.report_info }}</span></p>
+  <hr class="my-4 border-t border-gray-300">
+  <div class="medications">
+    <h2 class="text-xl font-semibold mb-2">Medicamentos</h2>
+    <div class="medication-details mb-4" *ngFor="let medication of report.medicines">
+      <p class="font-semibold">{{ medication.medicine_name }}</p>
+      <p class="text-base">Dosis: {{ medication.dosis }}</p>
+      <div class="flex">
+        <div class="flex-1 mr-4">
+          <p class="font-semibold">Mañana</p>
+          <i class="fas fa-sun text-yellow-500"></i>
+          <p>{{ medication.morning_dose }}</p>
+        </div>
+        <div class="flex-1 mr-4">
+          <p class="font-semibold">Tarde</p>
+          <i class="fas fa-cloud-sun text-blue-500"></i>
+          <p>{{ medication.noon_dose }}</p>
+        </div>
+        <div class="flex-1">
+          <p class="font-semibold">Noche</p>
+          <i class="fas fa-moon text-purple-500"></i>
+          <p>{{ medication.night_dose }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

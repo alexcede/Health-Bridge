@@ -19,5 +19,7 @@ urlpatterns = [
     path('report/get/<int:user_id>/', views.get_user_reports),
     
     path('login/', views.user_login),
-    path('photo/<str:filename>/', views.get_user_profile_picture)
+    path('photo/<str:filename>/', views.get_user_profile_picture),
+    
+    path('recipes/<int:id>/', views.get_user_recipes),
 ]

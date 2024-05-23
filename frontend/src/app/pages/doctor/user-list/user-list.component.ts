@@ -7,11 +7,12 @@ import { Action, getEntityProperties } from '../../../core/models/table-column';
 import { TableDataComponent } from '../../../shared/components/table-data/table-data.component';
 import { ModelPopupComponent } from '../../../shared/components/model-popup/model-popup.component';
 import { MatDialog } from '@angular/material/dialog';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-user-list',
   standalone: true,
-  imports: [AsyncPipe, ErrorMessageComponent, TableDataComponent],
+  imports: [AsyncPipe, ErrorMessageComponent, TableDataComponent, ReactiveFormsModule],
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.css']
 })
@@ -25,7 +26,7 @@ export class UserListComponent implements OnInit {
   title:string = 'users';
 
   ngOnInit(): void {
-    
+
     this.columns = getEntityProperties('user')
 
     this.loadUsers()

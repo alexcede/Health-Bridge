@@ -1,6 +1,6 @@
 <app-doctor-header />
-<h1 id="title">User profile</h1>
 <div *ngIf="user" class="main-div">
+  <h1 id="title">User profile</h1>
   <mat-card class="card">
     <mat-card-header>
       <div mat-card-avatar>
@@ -20,3 +20,12 @@
     </mat-card-content>
   </mat-card>
 </div>
+<div class="flex justify-between items-center mb-4">
+  <button mat-raised-button color="primary" (click)="addNewRecipe()">Add New Recipe</button>
+</div>
+<app-table-data
+  [tableTitle]="title"
+  [tableColumns]="columns"
+  [tableData]="recipes"
+  (tableAction)="onAction($event)">
+</app-table-data>

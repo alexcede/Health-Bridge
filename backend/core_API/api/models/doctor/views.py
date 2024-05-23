@@ -38,7 +38,7 @@ def doctor_login(request):
 
         # Buscar el usuario por su correo electrónico
         try:
-            doctor = Doctor.objects.get(email=email)
+            doctor = Doctor.objects.get(email=email, active=True)
         except Doctor.DoesNotExist:
             return JsonResponse({"error": "Incorrect email or password"}, safe=False)
 

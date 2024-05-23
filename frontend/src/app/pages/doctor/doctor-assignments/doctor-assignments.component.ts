@@ -12,6 +12,7 @@ import { forkJoin, Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { Action, getEntityProperties } from '../../../core/models/table-column';
 import { Router } from '@angular/router';
+import { AssignmentService } from '../../../core/services/assignment/assignment.service';
 
 @Component({
   selector: 'app-doctor-assignments',
@@ -25,7 +26,8 @@ export class DoctorAssignmentsComponent implements OnInit {
     private doctorService: DoctorService,
     private userService: UserService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private assignmentService: AssignmentService
   ) { }
 
   public doctorAssignmentList: DoctorTableAssignmentResponse[] = [];
@@ -85,13 +87,37 @@ export class DoctorAssignmentsComponent implements OnInit {
     return item.id;
   }
 
+  delete(assignmentId: number) {
+    this.assignmentService.deactivateAssignment(assignmentId).subscribe(
+      response => {
+        console.log(response);
+        // Actualizar la lista después de la eliminación
+        this.loadDoctorAssignments();
+      },
+      error => {
+        console.error('Error deleting user:', error);
+      }
+    );
+  }
+  activate(assignmentId: number) {
+    this.assignmentService.activateAssignment(assignmentId).subscribe(
+      response => {
+        console.log(response);
+
+        this.loadDoctorAssignments();
+      },
+      error => {
+        console.error('Error updating user:', error);
+      }
+    );
+  }
   onAction(tableAction: Action) {
     if (tableAction.action === 'Edit') {
       console.log('edit' + tableAction.row.id);
     } else if (tableAction.action === 'Delete') {
-      console.log('delete' + tableAction.row.id);
+      this.delete(tableAction.row.id)
     } else if (tableAction.action === 'Activate') {
-      console.log('activate' + tableAction.row.id);
+      this.activate(tableAction.row.id)
     } else if (tableAction.action === 'Info') {
       const userId = tableAction.row.user;
       this.router.navigate(['/doctor/user-profile', userId]);

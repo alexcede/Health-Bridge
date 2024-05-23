@@ -1,0 +1,11 @@
+.dialog-container {
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}

@@ -15,8 +15,6 @@
                   <ul>
                       <li (click)="closeMenu()"><a routerLink="/">Home</a></li>
                       <li *ngIf="!loggedIn" (click)="closeMenu()"><a routerLink="/user/login">Login</a></li>
-                      <li *ngIf="loggedIn" (click)="closeMenu()"><a routerLink="">Your recipes</a></li>
-                      <li *ngIf="loggedIn" (click)="closeMenu()"><a routerLink="">Your assignments</a></li>
                       <li (click)="closeMenu()"><a routerLink="/">About us</a></li>
                       <li (click)="closeMenu()"><a routerLink="/">Contact us</a></li>
                       <li *ngIf="loggedIn" (click)="closeMenu()"><a routerLink="/user/{{ userId }}">Profile</a></li>
