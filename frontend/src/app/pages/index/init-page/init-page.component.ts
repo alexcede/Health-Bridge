@@ -4,10 +4,11 @@ import { ButtonModule } from 'primeng/button';
 import { ImageModule } from 'primeng/image';
 import { HeaderComponent } from '../../user/header/header.component';
 import { RouterOutlet } from '@angular/router';
+import { UserFooterComponent } from '../../user/user-footer/user-footer.component';
 @Component({
   selector: 'app-init-page',
   standalone: true,
-  imports: [ButtonModule, ImageModule, HeaderComponent, RouterOutlet],
+  imports: [ButtonModule, ImageModule, HeaderComponent, RouterOutlet, UserFooterComponent],
   templateUrl: './init-page.component.html',
   styleUrl: './init-page.component.css'
 })

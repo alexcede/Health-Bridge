@@ -9,6 +9,11 @@
   opacity: 1;
   transform: translateY(0);
 }
+
+.main-div {
+  margin-bottom:14.3%;
+}
+
 @media (max-width: 433px) {
   .section-padding-md {
     font-size: 1.5rem !important;

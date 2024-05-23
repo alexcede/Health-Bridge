@@ -11,11 +11,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '../../../core/services/auth/auth.service';
 import { Action } from '../../../core/models/table-column';
 import { ReportDetailDialogComponent } from '../../report/report-detail-dialog/report-detail-dialog.component';
+import { UserFooterComponent } from '../user-footer/user-footer.component';
 
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [HeaderComponent, CommonModule, MatCardModule, RouterOutlet, MatCardAvatar, MatCardContent,MatCardHeader,MatCardImage, TableDataComponent],
+  imports: [HeaderComponent, CommonModule, MatCardModule, RouterOutlet, MatCardAvatar, MatCardContent,MatCardHeader,MatCardImage, TableDataComponent, UserFooterComponent],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.css'
 })

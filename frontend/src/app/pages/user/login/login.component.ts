@@ -10,10 +10,11 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { Router, RouterOutlet } from '@angular/router';
 import { AuthService } from '../../../core/services/auth/auth.service';
+import { UserFooterComponent } from '../user-footer/user-footer.component';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ButtonModule, InputTextModule,HeaderComponent, ReactiveFormsModule, CommonModule, HttpClientModule, RouterOutlet],
+  imports: [ButtonModule, InputTextModule,HeaderComponent, ReactiveFormsModule, CommonModule, HttpClientModule, RouterOutlet, UserFooterComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
